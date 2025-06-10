@@ -10,7 +10,7 @@ message LivenessResponse {
    string message = 1;
 }
 
-service GoService {
+service LivenessService {
    rpc Live(LivenessRequest) returns (LivenessResponse) {
       option (google.api.http) = {
          get: "/live"

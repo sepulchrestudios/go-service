@@ -35,7 +35,7 @@ var (
 	_ = metadata.Join
 )
 
-func request_GoService_Live_0(ctx context.Context, marshaler runtime.Marshaler, client GoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_LivenessService_Live_0(ctx context.Context, marshaler runtime.Marshaler, client LivenessServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq LivenessRequest
 		metadata runtime.ServerMetadata
@@ -45,7 +45,7 @@ func request_GoService_Live_0(ctx context.Context, marshaler runtime.Marshaler, 
 	return msg, metadata, err
 }
 
-func local_request_GoService_Live_0(ctx context.Context, marshaler runtime.Marshaler, server GoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_LivenessService_Live_0(ctx context.Context, marshaler runtime.Marshaler, server LivenessServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq LivenessRequest
 		metadata runtime.ServerMetadata
@@ -54,7 +54,7 @@ func local_request_GoService_Live_0(ctx context.Context, marshaler runtime.Marsh
 	return msg, metadata, err
 }
 
-func request_GoService_Ready_0(ctx context.Context, marshaler runtime.Marshaler, client GoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_LivenessService_Ready_0(ctx context.Context, marshaler runtime.Marshaler, client LivenessServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq LivenessRequest
 		metadata runtime.ServerMetadata
@@ -64,7 +64,7 @@ func request_GoService_Ready_0(ctx context.Context, marshaler runtime.Marshaler,
 	return msg, metadata, err
 }
 
-func local_request_GoService_Ready_0(ctx context.Context, marshaler runtime.Marshaler, server GoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_LivenessService_Ready_0(ctx context.Context, marshaler runtime.Marshaler, server LivenessServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq LivenessRequest
 		metadata runtime.ServerMetadata
@@ -73,59 +73,59 @@ func local_request_GoService_Ready_0(ctx context.Context, marshaler runtime.Mars
 	return msg, metadata, err
 }
 
-// RegisterGoServiceHandlerServer registers the http handlers for service GoService to "mux".
-// UnaryRPC     :call GoServiceServer directly.
+// RegisterLivenessServiceHandlerServer registers the http handlers for service LivenessService to "mux".
+// UnaryRPC     :call LivenessServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterGoServiceHandlerFromEndpoint instead.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterLivenessServiceHandlerFromEndpoint instead.
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
-func RegisterGoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GoServiceServer) error {
-	mux.Handle(http.MethodGet, pattern_GoService_Live_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+func RegisterLivenessServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server LivenessServiceServer) error {
+	mux.Handle(http.MethodGet, pattern_LivenessService_Live_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.GoService/Live", runtime.WithHTTPPathPattern("/live"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.LivenessService/Live", runtime.WithHTTPPathPattern("/live"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GoService_Live_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_LivenessService_Live_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_GoService_Live_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_LivenessService_Live_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_GoService_Ready_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_LivenessService_Ready_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.GoService/Ready", runtime.WithHTTPPathPattern("/ready"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.LivenessService/Ready", runtime.WithHTTPPathPattern("/ready"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GoService_Ready_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_LivenessService_Ready_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_GoService_Ready_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_LivenessService_Ready_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
 }
 
-// RegisterGoServiceHandlerFromEndpoint is same as RegisterGoServiceHandler but
+// RegisterLivenessServiceHandlerFromEndpoint is same as RegisterLivenessServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterGoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterLivenessServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.NewClient(endpoint, opts...)
 	if err != nil {
 		return err
@@ -144,64 +144,64 @@ func RegisterGoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.Serv
 			}
 		}()
 	}()
-	return RegisterGoServiceHandler(ctx, mux, conn)
+	return RegisterLivenessServiceHandler(ctx, mux, conn)
 }
 
-// RegisterGoServiceHandler registers the http handlers for service GoService to "mux".
+// RegisterLivenessServiceHandler registers the http handlers for service LivenessService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterGoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterGoServiceHandlerClient(ctx, mux, NewGoServiceClient(conn))
+func RegisterLivenessServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterLivenessServiceHandlerClient(ctx, mux, NewLivenessServiceClient(conn))
 }
 
-// RegisterGoServiceHandlerClient registers the http handlers for service GoService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GoServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GoServiceClient"
+// RegisterLivenessServiceHandlerClient registers the http handlers for service LivenessService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "LivenessServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "LivenessServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "GoServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
-func RegisterGoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client GoServiceClient) error {
-	mux.Handle(http.MethodGet, pattern_GoService_Live_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+// "LivenessServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+func RegisterLivenessServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client LivenessServiceClient) error {
+	mux.Handle(http.MethodGet, pattern_LivenessService_Live_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.GoService/Live", runtime.WithHTTPPathPattern("/live"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.LivenessService/Live", runtime.WithHTTPPathPattern("/live"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GoService_Live_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_LivenessService_Live_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_GoService_Live_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_LivenessService_Live_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_GoService_Ready_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_LivenessService_Ready_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.GoService/Ready", runtime.WithHTTPPathPattern("/ready"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.LivenessService/Ready", runtime.WithHTTPPathPattern("/ready"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GoService_Ready_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_LivenessService_Ready_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_GoService_Ready_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_LivenessService_Ready_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	return nil
 }
 
 var (
-	pattern_GoService_Live_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"live"}, ""))
-	pattern_GoService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, ""))
+	pattern_LivenessService_Live_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"live"}, ""))
+	pattern_LivenessService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, ""))
 )
 
 var (
-	forward_GoService_Live_0  = runtime.ForwardResponseMessage
-	forward_GoService_Ready_0 = runtime.ForwardResponseMessage
+	forward_LivenessService_Live_0  = runtime.ForwardResponseMessage
+	forward_LivenessService_Ready_0 = runtime.ForwardResponseMessage
 )

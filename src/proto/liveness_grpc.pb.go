@@ -19,139 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GoService_Live_FullMethodName  = "/proto.GoService/Live"
-	GoService_Ready_FullMethodName = "/proto.GoService/Ready"
+	LivenessService_Live_FullMethodName  = "/proto.LivenessService/Live"
+	LivenessService_Ready_FullMethodName = "/proto.LivenessService/Ready"
 )
 
-// GoServiceClient is the client API for GoService service.
+// LivenessServiceClient is the client API for LivenessService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type GoServiceClient interface {
+type LivenessServiceClient interface {
 	Live(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error)
 	Ready(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error)
 }
 
-type goServiceClient struct {
+type livenessServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewGoServiceClient(cc grpc.ClientConnInterface) GoServiceClient {
-	return &goServiceClient{cc}
+func NewLivenessServiceClient(cc grpc.ClientConnInterface) LivenessServiceClient {
+	return &livenessServiceClient{cc}
 }
 
-func (c *goServiceClient) Live(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error) {
+func (c *livenessServiceClient) Live(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LivenessResponse)
-	err := c.cc.Invoke(ctx, GoService_Live_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, LivenessService_Live_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *goServiceClient) Ready(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error) {
+func (c *livenessServiceClient) Ready(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LivenessResponse)
-	err := c.cc.Invoke(ctx, GoService_Ready_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, LivenessService_Ready_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// GoServiceServer is the server API for GoService service.
-// All implementations must embed UnimplementedGoServiceServer
+// LivenessServiceServer is the server API for LivenessService service.
+// All implementations must embed UnimplementedLivenessServiceServer
 // for forward compatibility.
-type GoServiceServer interface {
+type LivenessServiceServer interface {
 	Live(context.Context, *LivenessRequest) (*LivenessResponse, error)
 	Ready(context.Context, *LivenessRequest) (*LivenessResponse, error)
-	mustEmbedUnimplementedGoServiceServer()
+	mustEmbedUnimplementedLivenessServiceServer()
 }
 
-// UnimplementedGoServiceServer must be embedded to have
+// UnimplementedLivenessServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedGoServiceServer struct{}
+type UnimplementedLivenessServiceServer struct{}
 
-func (UnimplementedGoServiceServer) Live(context.Context, *LivenessRequest) (*LivenessResponse, error) {
+func (UnimplementedLivenessServiceServer) Live(context.Context, *LivenessRequest) (*LivenessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Live not implemented")
 }
-func (UnimplementedGoServiceServer) Ready(context.Context, *LivenessRequest) (*LivenessResponse, error) {
+func (UnimplementedLivenessServiceServer) Ready(context.Context, *LivenessRequest) (*LivenessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ready not implemented")
 }
-func (UnimplementedGoServiceServer) mustEmbedUnimplementedGoServiceServer() {}
-func (UnimplementedGoServiceServer) testEmbeddedByValue()                   {}
+func (UnimplementedLivenessServiceServer) mustEmbedUnimplementedLivenessServiceServer() {}
+func (UnimplementedLivenessServiceServer) testEmbeddedByValue()                         {}
 
-// UnsafeGoServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to GoServiceServer will
+// UnsafeLivenessServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to LivenessServiceServer will
 // result in compilation errors.
-type UnsafeGoServiceServer interface {
-	mustEmbedUnimplementedGoServiceServer()
+type UnsafeLivenessServiceServer interface {
+	mustEmbedUnimplementedLivenessServiceServer()
 }
 
-func RegisterGoServiceServer(s grpc.ServiceRegistrar, srv GoServiceServer) {
-	// If the following call pancis, it indicates UnimplementedGoServiceServer was
+func RegisterLivenessServiceServer(s grpc.ServiceRegistrar, srv LivenessServiceServer) {
+	// If the following call pancis, it indicates UnimplementedLivenessServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&GoService_ServiceDesc, srv)
+	s.RegisterService(&LivenessService_ServiceDesc, srv)
 }
 
-func _GoService_Live_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _LivenessService_Live_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LivenessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GoServiceServer).Live(ctx, in)
+		return srv.(LivenessServiceServer).Live(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GoService_Live_FullMethodName,
+		FullMethod: LivenessService_Live_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoServiceServer).Live(ctx, req.(*LivenessRequest))
+		return srv.(LivenessServiceServer).Live(ctx, req.(*LivenessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GoService_Ready_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _LivenessService_Ready_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LivenessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GoServiceServer).Ready(ctx, in)
+		return srv.(LivenessServiceServer).Ready(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GoService_Ready_FullMethodName,
+		FullMethod: LivenessService_Ready_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoServiceServer).Ready(ctx, req.(*LivenessRequest))
+		return srv.(LivenessServiceServer).Ready(ctx, req.(*LivenessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// GoService_ServiceDesc is the grpc.ServiceDesc for GoService service.
+// LivenessService_ServiceDesc is the grpc.ServiceDesc for LivenessService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var GoService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.GoService",
-	HandlerType: (*GoServiceServer)(nil),
+var LivenessService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.LivenessService",
+	HandlerType: (*LivenessServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Live",
-			Handler:    _GoService_Live_Handler,
+			Handler:    _LivenessService_Live_Handler,
 		},
 		{
 			MethodName: "Ready",
-			Handler:    _GoService_Ready_Handler,
+			Handler:    _LivenessService_Ready_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

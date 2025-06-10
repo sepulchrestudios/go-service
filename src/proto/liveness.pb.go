@@ -109,8 +109,8 @@ const file_liveness_proto_rawDesc = "" +
 	"\x0eliveness.proto\x12\x05proto\x1a\x1cgoogle/api/annotations.proto\"\x11\n" +
 	"\x0fLivenessRequest\",\n" +
 	"\x10LivenessResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\x9d\x01\n" +
-	"\tGoService\x12F\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\xa3\x01\n" +
+	"\x0fLivenessService\x12F\n" +
 	"\x04Live\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\r\x82\xd3\xe4\x93\x02\a\x12\x05/live\x12H\n" +
 	"\x05Ready\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x0e\x82\xd3\xe4\x93\x02\b\x12\x06/readyB.Z,github.com/sepulchrestudios/go-service/protob\x06proto3"
 
@@ -132,10 +132,10 @@ var file_liveness_proto_goTypes = []any{
 	(*LivenessResponse)(nil), // 1: proto.LivenessResponse
 }
 var file_liveness_proto_depIdxs = []int32{
-	0, // 0: proto.GoService.Live:input_type -> proto.LivenessRequest
-	0, // 1: proto.GoService.Ready:input_type -> proto.LivenessRequest
-	1, // 2: proto.GoService.Live:output_type -> proto.LivenessResponse
-	1, // 3: proto.GoService.Ready:output_type -> proto.LivenessResponse
+	0, // 0: proto.LivenessService.Live:input_type -> proto.LivenessRequest
+	0, // 1: proto.LivenessService.Ready:input_type -> proto.LivenessRequest
+	1, // 2: proto.LivenessService.Live:output_type -> proto.LivenessResponse
+	1, // 3: proto.LivenessService.Ready:output_type -> proto.LivenessResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
