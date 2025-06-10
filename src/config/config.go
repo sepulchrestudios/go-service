@@ -11,11 +11,17 @@ import (
 type PropertyName string
 
 const (
+	// PropertyNameDebugMode represents whether debugging mode is turned on.
+	PropertyNameDebugMode PropertyName = "DEBUG"
+
 	// PropertyNameEnvironment represents the environment on which the service is running.
 	PropertyNameEnvironment PropertyName = "ENVIRONMENT"
 
+	// PropertyNameGRPCPort represents the port on which the gRPC gateway will be listening.
+	PropertyNameGRPCPort PropertyName = "GRPC_PORT"
+
 	// PropertyNameHttpPort represents the port on which the HTTP service will be listening.
-	PropertyNameHttpPort PropertyName = "PORT"
+	PropertyNameHTTPPort PropertyName = "PORT"
 
 	// PropertyNameServiceName represents the human-readable name of the service that is running.
 	PropertyNameServiceName PropertyName = "NAME"
