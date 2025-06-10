@@ -1,0 +1,24 @@
+syntax = "proto3";
+package proto;
+option go_package = "github.com/sepulchrestudios/go-service/proto";
+
+import "google/api/annotations.proto";
+
+message LivenessRequest {}
+
+message LivenessResponse {
+   string message = 1;
+}
+
+service GoService {
+   rpc Live(LivenessRequest) returns (LivenessResponse) {
+      option (google.api.http) = {
+         get: "/live"
+      };
+   }
+   rpc Ready(LivenessRequest) returns (LivenessResponse) {
+      option (google.api.http) = {
+         get: "/ready"
+      };
+   }
+}
