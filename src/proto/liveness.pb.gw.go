@@ -56,7 +56,7 @@ func local_request_LivenessService_Live_0(ctx context.Context, marshaler runtime
 
 func request_LivenessService_Ready_0(ctx context.Context, marshaler runtime.Marshaler, client LivenessServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq LivenessRequest
+		protoReq ReadinessRequest
 		metadata runtime.ServerMetadata
 	)
 	io.Copy(io.Discard, req.Body)
@@ -66,7 +66,7 @@ func request_LivenessService_Ready_0(ctx context.Context, marshaler runtime.Mars
 
 func local_request_LivenessService_Ready_0(ctx context.Context, marshaler runtime.Marshaler, server LivenessServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq LivenessRequest
+		protoReq ReadinessRequest
 		metadata runtime.ServerMetadata
 	)
 	msg, err := server.Ready(ctx, &protoReq)

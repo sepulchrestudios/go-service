@@ -102,6 +102,86 @@ func (x *LivenessResponse) GetMessage() string {
 	return ""
 }
 
+type ReadinessRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReadinessRequest) Reset() {
+	*x = ReadinessRequest{}
+	mi := &file_liveness_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReadinessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadinessRequest) ProtoMessage() {}
+
+func (x *ReadinessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_liveness_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadinessRequest.ProtoReflect.Descriptor instead.
+func (*ReadinessRequest) Descriptor() ([]byte, []int) {
+	return file_liveness_proto_rawDescGZIP(), []int{2}
+}
+
+type ReadinessResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReadinessResponse) Reset() {
+	*x = ReadinessResponse{}
+	mi := &file_liveness_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReadinessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadinessResponse) ProtoMessage() {}
+
+func (x *ReadinessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_liveness_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadinessResponse.ProtoReflect.Descriptor instead.
+func (*ReadinessResponse) Descriptor() ([]byte, []int) {
+	return file_liveness_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ReadinessResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_liveness_proto protoreflect.FileDescriptor
 
 const file_liveness_proto_rawDesc = "" +
@@ -109,10 +189,13 @@ const file_liveness_proto_rawDesc = "" +
 	"\x0eliveness.proto\x12\x05proto\x1a\x1cgoogle/api/annotations.proto\"\x11\n" +
 	"\x0fLivenessRequest\",\n" +
 	"\x10LivenessResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xb1\x01\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\x12\n" +
+	"\x10ReadinessRequest\"-\n" +
+	"\x11ReadinessResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\xb3\x01\n" +
 	"\x0fLivenessService\x12M\n" +
-	"\x04Live\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/health/live\x12O\n" +
-	"\x05Ready\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/health/readyB.Z,github.com/sepulchrestudios/go-service/protob\x06proto3"
+	"\x04Live\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/health/live\x12Q\n" +
+	"\x05Ready\x12\x17.proto.ReadinessRequest\x1a\x18.proto.ReadinessResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/health/readyB.Z,github.com/sepulchrestudios/go-service/protob\x06proto3"
 
 var (
 	file_liveness_proto_rawDescOnce sync.Once
@@ -126,16 +209,18 @@ func file_liveness_proto_rawDescGZIP() []byte {
 	return file_liveness_proto_rawDescData
 }
 
-var file_liveness_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_liveness_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_liveness_proto_goTypes = []any{
-	(*LivenessRequest)(nil),  // 0: proto.LivenessRequest
-	(*LivenessResponse)(nil), // 1: proto.LivenessResponse
+	(*LivenessRequest)(nil),   // 0: proto.LivenessRequest
+	(*LivenessResponse)(nil),  // 1: proto.LivenessResponse
+	(*ReadinessRequest)(nil),  // 2: proto.ReadinessRequest
+	(*ReadinessResponse)(nil), // 3: proto.ReadinessResponse
 }
 var file_liveness_proto_depIdxs = []int32{
 	0, // 0: proto.LivenessService.Live:input_type -> proto.LivenessRequest
-	0, // 1: proto.LivenessService.Ready:input_type -> proto.LivenessRequest
+	2, // 1: proto.LivenessService.Ready:input_type -> proto.ReadinessRequest
 	1, // 2: proto.LivenessService.Live:output_type -> proto.LivenessResponse
-	1, // 3: proto.LivenessService.Ready:output_type -> proto.LivenessResponse
+	3, // 3: proto.LivenessService.Ready:output_type -> proto.ReadinessResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -154,7 +239,7 @@ func file_liveness_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_liveness_proto_rawDesc), len(file_liveness_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

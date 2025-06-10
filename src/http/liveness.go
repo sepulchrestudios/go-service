@@ -2,23 +2,42 @@ package http
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	pb "github.com/sepulchrestudios/go-service/src/proto"
 	"google.golang.org/grpc"
 )
 
-// LivenessResponseMessageSuccess represents the "success" message for the liveness endpoints.
+// LivenessResponseMessageSuccess represents the "success" message for the liveness endpoint.
 const LivenessResponseMessageSuccess string = "ok"
+
+// ReadinessResponseMessageSuccess represents the "success" message for the readiness endpoint.
+const ReadinessResponseMessageSuccess string = LivenessResponseMessageSuccess
 
 // LivenessServer represents the implementation of the "liveness" endpoints for gRPC and HTTP.
 type LivenessServer struct {
 	pb.UnimplementedLivenessServiceServer
+
+	// LivenessFunction is the function that will execute when the liveness check runs. By default, this just returns
+	// a success response with a nil error but it can be reassigned to a custom implementation per-service.
+	LivenessFunction func() (*pb.LivenessResponse, error)
+
+	// ReadinessFunction is the function that will execute when the readiness check runs. By default, this just returns
+	// a success response with a nil error but it can be reassigned to a custom implementation per-service.
+	ReadinessFunction func() (*pb.ReadinessResponse, error)
 }
 
 // NewLivenessServer creates and returns a new LivenessServer struct instance.
 func NewLivenessServer() *LivenessServer {
-	return &LivenessServer{}
+	return &LivenessServer{
+		LivenessFunction: func() (*pb.LivenessResponse, error) {
+			return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
+		},
+		ReadinessFunction: func() (*pb.ReadinessResponse, error) {
+			return &pb.ReadinessResponse{Message: ReadinessResponseMessageSuccess}, nil
+		},
+	}
 }
 
 // RegisterLivenessServer takes a gRPC server registrar and a LivenessServer pointer, then registers them together.
@@ -33,9 +52,23 @@ func RegisterLivenessServerHandlers(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 func (l *LivenessServer) Live(ctx context.Context, req *pb.LivenessRequest) (*pb.LivenessResponse, error) {
-	return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
+	if l.LivenessFunction == nil {
+		return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
+	}
+	resp, err := l.LivenessFunction()
+	if err != nil {
+		return nil, fmt.Errorf("liveness check failed: %w", err)
+	}
+	return resp, nil
 }
 
-func (l *LivenessServer) Ready(ctx context.Context, req *pb.LivenessRequest) (*pb.LivenessResponse, error) {
-	return l.Live(ctx, req)
+func (l *LivenessServer) Ready(ctx context.Context, req *pb.ReadinessRequest) (*pb.ReadinessResponse, error) {
+	if l.ReadinessFunction == nil {
+		return &pb.ReadinessResponse{Message: ReadinessResponseMessageSuccess}, nil
+	}
+	resp, err := l.ReadinessFunction()
+	if err != nil {
+		return nil, fmt.Errorf("readiness check failed: %w", err)
+	}
+	return resp, nil
 }

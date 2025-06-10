@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LivenessServiceClient interface {
 	Live(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error)
-	Ready(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error)
+	Ready(ctx context.Context, in *ReadinessRequest, opts ...grpc.CallOption) (*ReadinessResponse, error)
 }
 
 type livenessServiceClient struct {
@@ -49,9 +49,9 @@ func (c *livenessServiceClient) Live(ctx context.Context, in *LivenessRequest, o
 	return out, nil
 }
 
-func (c *livenessServiceClient) Ready(ctx context.Context, in *LivenessRequest, opts ...grpc.CallOption) (*LivenessResponse, error) {
+func (c *livenessServiceClient) Ready(ctx context.Context, in *ReadinessRequest, opts ...grpc.CallOption) (*ReadinessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LivenessResponse)
+	out := new(ReadinessResponse)
 	err := c.cc.Invoke(ctx, LivenessService_Ready_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (c *livenessServiceClient) Ready(ctx context.Context, in *LivenessRequest, 
 // for forward compatibility.
 type LivenessServiceServer interface {
 	Live(context.Context, *LivenessRequest) (*LivenessResponse, error)
-	Ready(context.Context, *LivenessRequest) (*LivenessResponse, error)
+	Ready(context.Context, *ReadinessRequest) (*ReadinessResponse, error)
 	mustEmbedUnimplementedLivenessServiceServer()
 }
 
@@ -78,7 +78,7 @@ type UnimplementedLivenessServiceServer struct{}
 func (UnimplementedLivenessServiceServer) Live(context.Context, *LivenessRequest) (*LivenessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Live not implemented")
 }
-func (UnimplementedLivenessServiceServer) Ready(context.Context, *LivenessRequest) (*LivenessResponse, error) {
+func (UnimplementedLivenessServiceServer) Ready(context.Context, *ReadinessRequest) (*ReadinessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ready not implemented")
 }
 func (UnimplementedLivenessServiceServer) mustEmbedUnimplementedLivenessServiceServer() {}
@@ -121,7 +121,7 @@ func _LivenessService_Live_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _LivenessService_Ready_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LivenessRequest)
+	in := new(ReadinessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func _LivenessService_Ready_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: LivenessService_Ready_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LivenessServiceServer).Ready(ctx, req.(*LivenessRequest))
+		return srv.(LivenessServiceServer).Ready(ctx, req.(*ReadinessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
