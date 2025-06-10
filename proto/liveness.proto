@@ -13,12 +13,12 @@ message LivenessResponse {
 service LivenessService {
    rpc Live(LivenessRequest) returns (LivenessResponse) {
       option (google.api.http) = {
-         get: "/live"
+         get: "/health/live"
       };
    }
    rpc Ready(LivenessRequest) returns (LivenessResponse) {
       option (google.api.http) = {
-         get: "/ready"
+         get: "/health/ready"
       };
    }
 }

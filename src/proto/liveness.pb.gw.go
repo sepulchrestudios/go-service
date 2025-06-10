@@ -85,7 +85,7 @@ func RegisterLivenessServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.LivenessService/Live", runtime.WithHTTPPathPattern("/live"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.LivenessService/Live", runtime.WithHTTPPathPattern("/health/live"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -105,7 +105,7 @@ func RegisterLivenessServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.LivenessService/Ready", runtime.WithHTTPPathPattern("/ready"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.LivenessService/Ready", runtime.WithHTTPPathPattern("/health/ready"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -163,7 +163,7 @@ func RegisterLivenessServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.LivenessService/Live", runtime.WithHTTPPathPattern("/live"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.LivenessService/Live", runtime.WithHTTPPathPattern("/health/live"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -180,7 +180,7 @@ func RegisterLivenessServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.LivenessService/Ready", runtime.WithHTTPPathPattern("/ready"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/proto.LivenessService/Ready", runtime.WithHTTPPathPattern("/health/ready"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -197,8 +197,8 @@ func RegisterLivenessServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_LivenessService_Live_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"live"}, ""))
-	pattern_LivenessService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, ""))
+	pattern_LivenessService_Live_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"health", "live"}, ""))
+	pattern_LivenessService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"health", "ready"}, ""))
 )
 
 var (

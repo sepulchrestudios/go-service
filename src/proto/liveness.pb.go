@@ -109,10 +109,10 @@ const file_liveness_proto_rawDesc = "" +
 	"\x0eliveness.proto\x12\x05proto\x1a\x1cgoogle/api/annotations.proto\"\x11\n" +
 	"\x0fLivenessRequest\",\n" +
 	"\x10LivenessResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xa3\x01\n" +
-	"\x0fLivenessService\x12F\n" +
-	"\x04Live\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\r\x82\xd3\xe4\x93\x02\a\x12\x05/live\x12H\n" +
-	"\x05Ready\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x0e\x82\xd3\xe4\x93\x02\b\x12\x06/readyB.Z,github.com/sepulchrestudios/go-service/protob\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage2\xb1\x01\n" +
+	"\x0fLivenessService\x12M\n" +
+	"\x04Live\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/health/live\x12O\n" +
+	"\x05Ready\x12\x16.proto.LivenessRequest\x1a\x17.proto.LivenessResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/health/readyB.Z,github.com/sepulchrestudios/go-service/protob\x06proto3"
 
 var (
 	file_liveness_proto_rawDescOnce sync.Once
