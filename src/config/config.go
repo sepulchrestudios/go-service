@@ -17,7 +17,7 @@ const (
 	// PropertyNameEnvironment represents the environment on which the service is running.
 	PropertyNameEnvironment PropertyName = "ENVIRONMENT"
 
-	// PropertyNameGRPCPort represents the port on which the gRPC gateway will be listening.
+	// PropertyNameGRPCPort represents the port on which the gRPC server will be listening.
 	PropertyNameGRPCPort PropertyName = "GRPC_PORT"
 
 	// PropertyNameHttpPort represents the port on which the HTTP service will be listening.
