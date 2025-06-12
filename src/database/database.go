@@ -54,5 +54,8 @@ func (dc *DatabaseConnection) GetGORMDB() *gorm.DB {
 
 // IsUsingDebugMode returns a boolean describing whether "debug mode" is turned on for this connection.
 func (dc *DatabaseConnection) IsUsingDebugMode() bool {
+	if dc == nil {
+		return false
+	}
 	return dc.debugMode
 }
