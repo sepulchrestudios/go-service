@@ -1,6 +1,7 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 
 	"go.uber.org/zap"
@@ -29,6 +30,18 @@ func NewStandardLogger(shouldUseDebugMode bool, options ...zap.Option) (*Standar
 	}
 	return &StandardLogger{
 		debugMode: shouldUseDebugMode,
+		logger:    logger,
+	}, nil
+}
+
+// NewStandardLoggerFromZapLogger takes an existing zap logger pointer and returns a new Logger instance plus any error
+// that may have occurred.
+func NewStandardLoggerFromZapLogger(logger *zap.Logger) (*StandardLogger, error) {
+	if logger == nil {
+		return nil, errors.New("zap logger instance cannot be nil")
+	}
+	return &StandardLogger{
+		debugMode: logger.Core().Enabled(zapcore.DebugLevel),
 		logger:    logger,
 	}, nil
 }

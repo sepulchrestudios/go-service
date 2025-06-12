@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// Logger is an interface that represents a zap-based logger.
 type Logger interface {
 	// Debug logs a message at debug-level.
 	Debug(msg string, fields ...zap.Field)
