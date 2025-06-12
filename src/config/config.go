@@ -1,11 +1,16 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
 	"github.com/joho/godotenv"
 )
+
+// ErrFailedLoadingConfigurationFile is a sentinel error representing a situation where the configuration file could
+// not be loaded for some reason.
+var ErrFailedLoadingConfigurationFile = errors.New("failed loading configuration file")
 
 // PropertyName represents the name of a configuration key.
 type PropertyName string
@@ -46,7 +51,7 @@ func LoadConfigurationFromFile(path *string) (*Config, error) {
 
 	configMap, err = godotenv.Read(configFilenames...)
 	if err != nil {
-		return nil, fmt.Errorf("failed loading configuration file: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrFailedLoadingConfigurationFile, err)
 	}
 
 	config := &Config{

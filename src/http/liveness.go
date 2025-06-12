@@ -2,12 +2,19 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	pb "github.com/sepulchrestudios/go-service/src/proto"
 	"google.golang.org/grpc"
 )
+
+// ErrFailedLivenessCheck is a sentinel error representing a failed liveness check.
+var ErrFailedLivenessCheck = errors.New("liveness check failed")
+
+// ErrFailedReadinessCheck is a sentinel error representing a failed readiness check.
+var ErrFailedReadinessCheck = errors.New("readiness check failed")
 
 // LivenessResponseMessageSuccess represents the "success" message for the liveness endpoint.
 const LivenessResponseMessageSuccess string = "ok"
@@ -57,7 +64,7 @@ func (l *LivenessServer) Live(ctx context.Context, req *pb.LivenessRequest) (*pb
 	}
 	resp, err := l.LivenessFunction()
 	if err != nil {
-		return nil, fmt.Errorf("liveness check failed: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrFailedLivenessCheck, err)
 	}
 	return resp, nil
 }
@@ -68,7 +75,7 @@ func (l *LivenessServer) Ready(ctx context.Context, req *pb.ReadinessRequest) (*
 	}
 	resp, err := l.ReadinessFunction()
 	if err != nil {
-		return nil, fmt.Errorf("readiness check failed: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrFailedReadinessCheck, err)
 	}
 	return resp, nil
 }

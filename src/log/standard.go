@@ -8,6 +8,12 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// ErrCannotCreateLogger is a sentinel error representing a failure to create a logger.
+var ErrCannotCreateLogger = errors.New("cannot create logger")
+
+// ErrZapLoggerCannotBeNil is a sentinel error representing an attempt to use a nil zap-based logger pointer.
+var ErrZapLoggerCannotBeNil = errors.New("zap logger instance cannot be nil")
+
 // StandardLogger represents a struct that provides logging capabilities.
 type StandardLogger struct {
 	debugMode bool
@@ -26,7 +32,7 @@ func NewStandardLogger(shouldUseDebugMode bool, options ...zap.Option) (*Standar
 		logger, err = zap.NewProduction(options...)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("could not create logger: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrCannotCreateLogger, err)
 	}
 	return &StandardLogger{
 		debugMode: shouldUseDebugMode,
@@ -38,7 +44,7 @@ func NewStandardLogger(shouldUseDebugMode bool, options ...zap.Option) (*Standar
 // that may have occurred.
 func NewStandardLoggerFromZapLogger(logger *zap.Logger) (*StandardLogger, error) {
 	if logger == nil {
-		return nil, errors.New("zap logger instance cannot be nil")
+		return nil, ErrZapLoggerCannotBeNil
 	}
 	return &StandardLogger{
 		debugMode: logger.Core().Enabled(zapcore.DebugLevel),

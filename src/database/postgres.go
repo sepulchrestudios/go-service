@@ -9,6 +9,22 @@ import (
 	"gorm.io/gorm"
 )
 
+// ErrPostgresNoConnectionArguments is a sentinel error representing a nil connection arguments pointer when attempting
+// to make a Postgres DB connection.
+var ErrPostgresNoConnectionArguments = errors.New("connection arguments for postgres cannot be nil")
+
+// ErrPostgresNoConnectionDatabaseHost is a sentinel error representing a blank database host string when attempting to
+// make a Postgres DB connection.
+var ErrPostgresNoConnectionDatabaseHost = errors.New("database host in connection arguments cannot be blank")
+
+// ErrPostgresNoConnectionDatabaseName is a sentinel error representing a blank database name string when attempting to
+// make a Postgres DB connection.
+var ErrPostgresNoConnectionDatabaseName = errors.New("database name in connection arguments cannot be blank")
+
+// ErrPostgresNoConnectionUsername is a sentinel error representing a blank username string when attempting to make a
+// Postgres DB connection.
+var ErrPostgresNoConnectionUsername = errors.New("username in connection arguments cannot be blank")
+
 // PostgresDatabaseConnectionArguments is a struct representing the properties expected when making a connection to a
 // Postgres database environment.
 type PostgresDatabaseConnectionArguments struct {
@@ -74,16 +90,16 @@ func NewPostgresDatabaseConnection(
 // if any of the expected fields are missing. Returns nil if the validation checks pass.
 func ValidatePostgresConnectionArguments(connectionArguments *PostgresDatabaseConnectionArguments) error {
 	if connectionArguments == nil {
-		return errors.New("connection arguments for postgres cannot be nil")
+		return ErrPostgresNoConnectionArguments
 	}
 	if connectionArguments.Host == "" {
-		return errors.New("database host in connection arguments cannot be blank")
+		return ErrPostgresNoConnectionDatabaseHost
 	}
 	if connectionArguments.DatabaseName == "" {
-		return errors.New("database name in connection arguments cannot be blank")
+		return ErrPostgresNoConnectionDatabaseName
 	}
 	if connectionArguments.Username == "" {
-		return errors.New("username in connection arguments cannot be blank")
+		return ErrPostgresNoConnectionUsername
 	}
 	return nil
 }

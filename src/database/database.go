@@ -7,6 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// ErrCannotOpenDatabaseConnection is a sentinel error describing a failure to open a database connection.
+var ErrCannotOpenDatabaseConnection = errors.New("cannot open database connection")
+
+// ErrNoDatabaseConnectionReturned is a sentinel error describing a nil database connection being returned from GORM
+// without an actual GORM error occurring at the same time.
+var ErrNoDatabaseConnectionReturned = errors.New("nil database connection returned from GORM")
+
 // DatabaseConnection is a struct representing an active DB connection.
 type DatabaseConnection struct {
 	db        *gorm.DB
@@ -31,10 +38,10 @@ func NewDatabaseConnection(
 ) (*DatabaseConnection, error) {
 	db, err := gorm.Open(gormConnection, gormOptions...)
 	if err != nil {
-		return nil, fmt.Errorf("could not open database connection: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrCannotOpenDatabaseConnection, err)
 	}
 	if db == nil {
-		return nil, errors.New("nil database connection returned from GORM without error")
+		return nil, ErrNoDatabaseConnectionReturned
 	}
 	if shouldUseDebugMode {
 		db = db.Debug()
