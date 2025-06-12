@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -73,16 +74,16 @@ func NewPostgresDatabaseConnection(
 // if any of the expected fields are missing. Returns nil if the validation checks pass.
 func ValidatePostgresConnectionArguments(connectionArguments *PostgresDatabaseConnectionArguments) error {
 	if connectionArguments == nil {
-		return fmt.Errorf("connection arguments for postgres cannot be nil")
+		return errors.New("connection arguments for postgres cannot be nil")
 	}
 	if connectionArguments.Host == "" {
-		return fmt.Errorf("database host in connection arguments cannot be blank")
+		return errors.New("database host in connection arguments cannot be blank")
 	}
 	if connectionArguments.DatabaseName == "" {
-		return fmt.Errorf("database name in connection arguments cannot be blank")
+		return errors.New("database name in connection arguments cannot be blank")
 	}
 	if connectionArguments.Username == "" {
-		return fmt.Errorf("username in connection arguments cannot be blank")
+		return errors.New("username in connection arguments cannot be blank")
 	}
 	return nil
 }

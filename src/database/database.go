@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -33,7 +34,7 @@ func NewDatabaseConnection(
 		return nil, fmt.Errorf("could not open database connection: %w", err)
 	}
 	if db == nil {
-		return nil, fmt.Errorf("nil database connection returned from GORM without error")
+		return nil, errors.New("nil database connection returned from GORM without error")
 	}
 	if shouldUseDebugMode {
 		db = db.Debug()
