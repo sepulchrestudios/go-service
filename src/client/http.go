@@ -32,16 +32,6 @@ const (
 	HTTPMethodTrace
 )
 
-// NoRequestOverrideHeaders is an empty map that represents no override headers being provided in a request. This
-// primarily exists for readability as well as allowing consuming logic to use the same method call but conditionally
-// choose whether to supply headers.
-var NoRequestOverrideHeaders = map[string]string{}
-
-// NoRequestBody is an empty byte slice that represents no body data being provided in a request. This primarily exists
-// for readability as well as allowing consuming logic to use the same method call but conditionally choose whether to
-// supply body data.
-var NoRequestBody = []byte{}
-
 // HTTPAwareClient is an interface that represents a client used for performing HTTP operations.
 type HTTPAwareClient interface {
 	// Send sends an HTTP request using the specified method and URL. Returns a byte slice representing the response,
@@ -57,6 +47,7 @@ type HTTPAwareClient interface {
 	// error that was generated during the request process.
 	SendWithHeaders(method HTTPMethod, url string, overrideHeaders map[string]string) ([]byte, error)
 
-	// SendWithBody performs the same operation as SendWithHeaders but allows for the inclusion of request body data.
+	// SendWithHeadersAndBody performs the same operation as SendWithHeaders but allows for the inclusion of request
+	// body data.
 	SendWithHeadersAndBody(method HTTPMethod, url string, overrideHeaders map[string]string, body []byte) ([]byte, error)
 }

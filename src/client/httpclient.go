@@ -19,6 +19,20 @@ func MakeDefaultNetHTTPClient() *http.Client {
 	return &http.Client{}
 }
 
+// MakeEmptyRequestBody returns an empty byte slice that represents no body data being provided in a request. This
+// primarily exists for readability as well as allowing consuming logic to use the same method call but conditionally
+// choose whether to supply body data.
+func MakeEmptyRequestBody() []byte {
+	return []byte{}
+}
+
+// MakeEmptyRequestHeaders returns an empty map that represents no override headers being provided in a request. This
+// primarily exists for readability as well as allowing consuming logic to use the same method call but conditionally
+// choose whether to supply headers.
+func MakeEmptyRequestHeaders() map[string]string {
+	return map[string]string{}
+}
+
 // NewHTTPClient builds and returns a new HTTPClient pointer instance as well as any error that may have occurred
 // during creation.
 func NewHTTPClient() (*HTTPClient, error) {
