@@ -9,7 +9,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sepulchrestudios/go-service/src/config"
-	"github.com/sepulchrestudios/go-service/src/http"
+	"github.com/sepulchrestudios/go-service/src/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -42,8 +42,8 @@ func main() {
 
 	// Create a gRPC server object and liveness server object, then attach them
 	grpcServer := grpc.NewServer()
-	livenessServer := http.NewLivenessServer()
-	http.RegisterLivenessServer(grpcServer, livenessServer)
+	livenessServer := server.NewLivenessServer()
+	server.RegisterLivenessServer(grpcServer, livenessServer)
 
 	// Serve gRPC server
 	log.Println(fmt.Sprintf("Serving gRPC on 0.0.0.0:%s", grpcPort))
@@ -63,7 +63,7 @@ func main() {
 
 	// Register liveness server with the mux and client connection
 	gwmux := runtime.NewServeMux()
-	err = http.RegisterLivenessServerHandlers(context.Background(), gwmux, conn)
+	err = server.RegisterLivenessServerHandlers(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
