@@ -46,7 +46,7 @@ func main() {
 	server.RegisterLivenessServer(grpcServer, livenessServer)
 
 	// Serve gRPC server
-	log.Println(fmt.Sprintf("Serving gRPC on 0.0.0.0:%s", grpcPort))
+	log.Printf("Serving gRPC on 0.0.0.0:%s\n", grpcPort)
 	go func() {
 		log.Fatalln(grpcServer.Serve(lis))
 	}()
@@ -73,6 +73,6 @@ func main() {
 		Handler: gwmux,
 	}
 
-	log.Println(fmt.Sprintf("Serving gRPC-Gateway on http://0.0.0.0:%s", httpPort))
+	log.Printf("Serving gRPC-Gateway on http://0.0.0.0:%s\n", httpPort)
 	log.Fatalln(gwServer.ListenAndServe())
 }
