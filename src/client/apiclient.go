@@ -1,10 +1,5 @@
 package client
 
-import "errors"
-
-// ErrHTTPClientCannotBeNil is a sentinel error representing an attempt to use a nil HTTPClient pointer.
-var ErrHTTPClientCannotBeNil = errors.New("HTTPClient instance cannot be nil")
-
 // HTTPAPIClient represents a struct that provides a standard way to invoke API calls on services over HTTP.
 type HTTPAPIClient struct {
 	httpclient *HTTPAwareClient
