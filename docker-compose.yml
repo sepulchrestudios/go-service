@@ -1,0 +1,17 @@
+services:
+  go-server:
+    build: ./build
+    ports:
+      # [host port]:[container port]
+      - "8080:8080"
+    environment:
+      # Change this to modify the HTTP listen port in the container
+      - PORT=8080
+      # Change this to modify the gRPC listen port in the container
+      - GRPC_PORT=8081
+      # Change this to update the environment
+      - ENVIRONMENT=dev
+      # Change this to modify whether debugging is enabled or disabled
+      - DEBUG=true
+      # Change this to modify the name of the service that is running
+      - NAME="Go Service"
