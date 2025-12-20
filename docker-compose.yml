@@ -5,6 +5,8 @@ services:
       # [host port]:[container port]
       - "8080:8080"
     environment:
+      # Set to false since we are going to be using the docker-compose.yml file for environment configuration
+      - LOAD_ENV_FROM_FILE=false
       # Change this to modify the HTTP listen port in the container
       - PORT=8080
       # Change this to modify the gRPC listen port in the container

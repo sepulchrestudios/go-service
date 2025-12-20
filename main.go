@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 	gohttp "net/http"
+	"os"
+	"strconv"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sepulchrestudios/go-service/src/config"
@@ -18,10 +20,25 @@ func main() {
 	// Much of this comes from the barebones gRPC Gateway functionality:
 	// https://grpc-ecosystem.github.io/grpc-gateway/docs/tutorials/adding_annotations/#using-protoc
 
-	// Load the environment configuration
-	envConfig, err := config.LoadConfiguration()
+	var envConfig config.Config
+	var err error
+
+	// Determine whether to load environment configuration from a file or directly from environment variables
+	shouldLoadFromFileStr, exists := os.LookupEnv(string(config.PropertyNameLoadEnvFromFile))
+	shouldLoadFromFile, _ := strconv.ParseBool(shouldLoadFromFileStr)
+	if exists && shouldLoadFromFile {
+		envConfig, err = config.LoadFileConfiguration()
+		if err != nil {
+			err = fmt.Errorf("%w: [file-based]", err)
+		}
+	} else {
+		envConfig, err = config.LoadEnvironmentConfiguration()
+		if err != nil {
+			err = fmt.Errorf("%w: [environment-based]", err)
+		}
+	}
 	if err != nil {
-		log.Fatalln("Cannot load configuration: ", err)
+		log.Fatalln("Cannot load environment configuration: ", err)
 	}
 
 	// Resolve the necessary ports

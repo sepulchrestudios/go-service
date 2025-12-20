@@ -1,16 +1,6 @@
 package config
 
-import (
-	"errors"
-	"fmt"
-	"sync"
-
-	"github.com/joho/godotenv"
-)
-
-// ErrFailedLoadingConfigurationFile is a sentinel error representing a situation where the configuration file could
-// not be loaded for some reason.
-var ErrFailedLoadingConfigurationFile = errors.New("failed loading configuration file")
+import "sync"
 
 // PropertyName represents the name of a configuration key.
 type PropertyName string
@@ -28,54 +18,50 @@ const (
 	// PropertyNameHttpPort represents the port on which the HTTP service will be listening.
 	PropertyNameHTTPPort PropertyName = "PORT"
 
+	// PropertyNameLoadEnvFromFile represents whether to load environment variables from a .env file.
+	PropertyNameLoadEnvFromFile PropertyName = "LOAD_ENV_FROM_FILE"
+
 	// PropertyNameServiceName represents the human-readable name of the service that is running.
 	PropertyNameServiceName PropertyName = "NAME"
 )
 
-// LoadConfiguration loads the environment configuration from the default path. Returns the config struct instance
-// plus any error that may have occurred.
-func LoadConfiguration() (*Config, error) {
-	return LoadConfigurationFromFile(nil)
-}
-
-// LoadConfigurationFromFile loads the environment configuration from the specified file or from the default path if
-// the path is nil. Returns the config struct instance plus any error that may have occurred.
-func LoadConfigurationFromFile(path *string) (*Config, error) {
-	var err error
-	configMap := map[string]string{}
-
-	configFilenames := []string{}
-	if path != nil {
-		configFilenames = append(configFilenames, *path)
-	}
-
-	configMap, err = godotenv.Read(configFilenames...)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedLoadingConfigurationFile, err)
-	}
-
-	config := &Config{
-		configuration: configMap,
-	}
-	return config, nil
-}
-
-// NewConfiguration returns a new empty configuration struct instance.
-func NewConfiguration() *Config {
-	return &Config{
-		configuration: map[string]string{},
+// GetAvailableConfigurationKeys returns a slice of all available configuration property names.
+func GetAvailableConfigurationKeys() []PropertyName {
+	return []PropertyName{
+		PropertyNameDebugMode,
+		PropertyNameEnvironment,
+		PropertyNameGRPCPort,
+		PropertyNameHTTPPort,
+		PropertyNameLoadEnvFromFile,
+		PropertyNameServiceName,
 	}
 }
 
-// Config represents a set of mapped configuration values. It also contains a mutex so it should ONLY be passed
-// around by-reference and never by-value.
-type Config struct {
+type Config interface {
+	// GetAllProperties returns a copy of the map that represents all configuration values.
+	GetAllProperties() map[string]string
+
+	// GetProperty takes a property name and returns the matching string value from the configuration plus a boolean
+	// describing whether the property name actually exists and was therefore valid.
+	GetProperty(property PropertyName) (string, bool)
+
+	// HasProperty returns whether the property name exists within the configuration.
+	HasProperty(property PropertyName) bool
+
+	// SetProperty sets the property with the given name to the provided value. Returns a boolean describing whether the
+	// property was already present and was therefore overwritten.
+	SetProperty(property PropertyName, value string) bool
+}
+
+// ConfigurationMap represents a set of mapped configuration values. It also contains a mutex so it should ONLY be
+// passed around by-reference and never by-value.
+type ConfigurationMap struct {
 	configuration map[string]string
 	mu            sync.Mutex
 }
 
 // GetAllProperties returns a copy of the map that represents all configuration values.
-func (c *Config) GetAllProperties() map[string]string {
+func (c *ConfigurationMap) GetAllProperties() map[string]string {
 	allConfigProperties := map[string]string{}
 	if c == nil || c.configuration == nil {
 		return allConfigProperties
@@ -92,7 +78,7 @@ func (c *Config) GetAllProperties() map[string]string {
 
 // GetProperty takes a property name and returns the matching string value from the configuration plus a boolean
 // describing whether the property name actually exists and was therefore valid.
-func (c *Config) GetProperty(property PropertyName) (string, bool) {
+func (c *ConfigurationMap) GetProperty(property PropertyName) (string, bool) {
 	if c == nil || c.configuration == nil {
 		return "", false
 	}
@@ -105,14 +91,17 @@ func (c *Config) GetProperty(property PropertyName) (string, bool) {
 }
 
 // HasProperty returns whether the property name exists within the configuration.
-func (c *Config) HasProperty(property PropertyName) bool {
+func (c *ConfigurationMap) HasProperty(property PropertyName) bool {
+	if c == nil || c.configuration == nil {
+		return false
+	}
 	_, exists := c.GetProperty(property)
 	return exists
 }
 
 // SetProperty sets the property with the given name to the provided value. Returns a boolean describing whether the
 // property was already present and was therefore overwritten.
-func (c *Config) SetProperty(property PropertyName, value string) bool {
+func (c *ConfigurationMap) SetProperty(property PropertyName, value string) bool {
 	if c == nil || c.configuration == nil {
 		return false
 	}
@@ -124,4 +113,20 @@ func (c *Config) SetProperty(property PropertyName, value string) bool {
 	_, willBeOverwritten := c.configuration[propertyKey]
 	c.configuration[propertyKey] = value
 	return willBeOverwritten
+}
+
+// NewConfigurationMap returns a new empty configuration map struct instance.
+func NewConfigurationMap() *ConfigurationMap {
+	return &ConfigurationMap{
+		configuration: map[string]string{},
+	}
+}
+
+// NewConfigurationMapFromMap returns a new configuration map struct instance initialized with the provided map.
+func NewConfigurationMapFromMap(input map[string]string) *ConfigurationMap {
+	configMap := NewConfigurationMap()
+	for key, val := range input {
+		configMap.configuration[key] = val
+	}
+	return configMap
 }
