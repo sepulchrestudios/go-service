@@ -1,9 +1,13 @@
 services:
   go-server:
-    build: ./build
+    build:
+      context: .
+      dockerfile: build/Dockerfile
     ports:
       # [host port]:[container port]
       - "8080:8080"
+    networks:
+      - go-server-network
     environment:
       # Set to false since we are going to be using the docker-compose.yml file for environment configuration
       - LOAD_ENV_FROM_FILE=false
@@ -17,3 +21,6 @@ services:
       - DEBUG=true
       # Change this to modify the name of the service that is running
       - NAME="Go Service"
+networks:
+  go-server-network:
+    driver: bridge
