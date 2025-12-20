@@ -65,7 +65,7 @@ const (
 // HTTPAwareClient is an interface that represents a client used for performing HTTP operations.
 type HTTPAwareClient interface {
 	// GetDefaultHeaders returns a map containing the headers that are included with every request by default.
-	GetDefaultHeaders()
+	GetDefaultHeaders() map[string]string
 
 	// Send sends an HTTP request using the specified method and URL. Returns a byte slice representing the response,
 	// if any, as well as any error that was generated during the request process.
