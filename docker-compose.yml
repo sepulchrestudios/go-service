@@ -8,19 +8,46 @@ services:
       - "8080:8080"
     networks:
       - go-server-network
+    depends_on:
+      go-server-db:
+        condition: service_healthy
     environment:
-      # Set to false since we are going to be using the docker-compose.yml file for environment configuration
-      - LOAD_ENV_FROM_FILE=false
-      # Change this to modify the HTTP listen port in the container
-      - PORT=8080
-      # Change this to modify the gRPC listen port in the container
-      - GRPC_PORT=8081
-      # Change this to update the environment
-      - ENVIRONMENT=dev
-      # Change this to modify whether debugging is enabled or disabled
-      - DEBUG=true
-      # Change this to modify the name of the service that is running
-      - NAME="Go Service"
+      # Set to false since we are going to be using the "env_file" option to load environment variables from a file
+      # and export them to the container, not load them directly into the file-based configuration map in the service
+      LOAD_ENV_FROM_FILE: false
+      # Use go-db-server-secret defined in the "secrets" section below
+      DB_PASSWORD_FILE: /run/secrets/go-db-server-secret
+    env_file:
+      - .env
+    secrets:
+      - go-db-server-secret
+  go-server-db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    networks:
+      - go-server-network
+    environment:
+      POSTGRES_USER: go_server_user
+      POSTGRES_DB: go_server_database
+      # Use go-db-server-secret defined in the "secrets" section below
+      POSTGRES_PASSWORD_FILE: /run/secrets/go-db-server-secret
+    secrets:
+      - go-db-server-secret
+    healthcheck:
+      test: [
+        "CMD", "pg_isready",
+        "-U", "${POSTGRES_USER:-postgres}",
+        "-d", "${POSTGRES_DB:-postgres}",
+        "-h", "go-server-db", # Use the service name as the host, not "localhost": https://stackoverflow.com/a/78477653
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+secrets:
+  go-db-server-secret:
+    file: .env.db-password # MAKE SURE THIS FILE EXISTS BEFORE STARTING THE CONTAINERS!
 networks:
   go-server-network:
     driver: bridge
