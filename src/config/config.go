@@ -6,6 +6,30 @@ import "sync"
 type PropertyName string
 
 const (
+	// PropertyNameDatabaseHost represents the database host address.
+	PropertyNameDatabaseHost PropertyName = "DATABASE_HOST"
+
+	// PropertyNameDatabaseName represents the database name.
+	PropertyNameDatabaseName PropertyName = "DATABASE_NAME"
+
+	// PropertyNameDatabasePassword represents the database password.
+	PropertyNameDatabasePassword PropertyName = "DATABASE_PASSWORD"
+
+	// PropertyNameDatabasePasswordFile represents the file path from which to read the database password.
+	PropertyNameDatabasePasswordFile PropertyName = "DATABASE_PASSWORD_FILE"
+
+	// PropertyNameDatabasePort represents the database port.
+	PropertyNameDatabasePort PropertyName = "DATABASE_PORT"
+
+	// PropertyNameDatabaseUsername represents the database username.
+	PropertyNameDatabaseUsername PropertyName = "DATABASE_USERNAME"
+
+	// PropertyNameDatabaseSSLMode represents the database SSL mode configuration.
+	PropertyNameDatabaseSSLMode PropertyName = "DATABASE_SSL_MODE"
+
+	// PropertyNameDatabaseTimezone represents the database default timezone.
+	PropertyNameDatabaseTimezone PropertyName = "DATABASE_TIMEZONE"
+
 	// PropertyNameDebugMode represents whether debugging mode is turned on.
 	PropertyNameDebugMode PropertyName = "DEBUG"
 
@@ -28,6 +52,14 @@ const (
 // GetAvailableConfigurationKeys returns a slice of all available configuration property names.
 func GetAvailableConfigurationKeys() []PropertyName {
 	return []PropertyName{
+		PropertyNameDatabaseHost,
+		PropertyNameDatabaseName,
+		PropertyNameDatabasePassword,
+		PropertyNameDatabasePasswordFile,
+		PropertyNameDatabasePort,
+		PropertyNameDatabaseUsername,
+		PropertyNameDatabaseSSLMode,
+		PropertyNameDatabaseTimezone,
 		PropertyNameDebugMode,
 		PropertyNameEnvironment,
 		PropertyNameGRPCPort,

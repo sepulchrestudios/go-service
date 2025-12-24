@@ -11,11 +11,64 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sepulchrestudios/go-service/src/config"
+	"github.com/sepulchrestudios/go-service/src/database"
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
 	"github.com/sepulchrestudios/go-service/src/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+// Connect to the Postgres database using the provided environment configuration. Returns the database connection
+// instance plus any error that may have occurred.
+func connectToPostgresDBFromConfig(
+	envConfig config.Config, isDebugModeActive bool,
+) (*database.DatabaseConnection, error) {
+	// Resolve the DB password from either a file path or the direct property
+	var dbPassword string
+	dbPasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameDatabasePasswordFile)
+	if exists && dbPasswordFilePath != "" {
+		passwordBytes, err := os.ReadFile(dbPasswordFilePath)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot read database password from file path '%s': %v", dbPasswordFilePath, err)
+		}
+		dbPassword = string(passwordBytes)
+	} else {
+		dbPassword, exists = envConfig.GetProperty(config.PropertyNameDatabasePassword)
+		if !exists {
+			return nil, fmt.Errorf("Cannot read property from configuration (make sure it exists): %s",
+				config.PropertyNameDatabasePassword)
+		}
+	}
+
+	// Create the Postgres connection from the environment configuration
+	dbHost, exists := envConfig.GetProperty(config.PropertyNameDatabaseHost)
+	if !exists {
+		return nil, fmt.Errorf("Cannot read property from configuration: %s", config.PropertyNameDatabaseHost)
+	}
+	dbUsername, exists := envConfig.GetProperty(config.PropertyNameDatabaseUsername)
+	if !exists {
+		return nil, fmt.Errorf("Cannot read property from configuration: %s", config.PropertyNameDatabaseUsername)
+	}
+	dbName, exists := envConfig.GetProperty(config.PropertyNameDatabaseName)
+	if !exists {
+		return nil, fmt.Errorf("Cannot read property from configuration: %s", config.PropertyNameDatabaseName)
+	}
+	dbPort, _ := envConfig.GetProperty(config.PropertyNameDatabasePort)
+	dbSSLMode, _ := envConfig.GetProperty(config.PropertyNameDatabaseSSLMode)
+	dbTimezone, _ := envConfig.GetProperty(config.PropertyNameDatabaseTimezone)
+	connectionArguments := &database.PostgresDatabaseConnectionArguments{
+		DatabaseConnectionArguments: database.DatabaseConnectionArguments{
+			DatabaseName: dbName,
+			Host:         dbHost,
+			Password:     dbPassword,
+			Port:         dbPort,
+			Username:     dbUsername,
+		},
+		SSLMode:  dbSSLMode,
+		Timezone: dbTimezone,
+	}
+	return database.NewPostgresDatabaseConnection(connectionArguments, isDebugModeActive)
+}
 
 func main() {
 	// Much of this comes from the barebones gRPC Gateway functionality:
@@ -49,6 +102,14 @@ func main() {
 	if err != nil {
 		log.Fatalln("Cannot create standard logger: ", err)
 	}
+
+	// Create the database connection here
+	logger.Info("Connecting to database...")
+	_, err = connectToPostgresDBFromConfig(envConfig, isDebugModeActive)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot connect to database: %v", err))
+	}
+	logger.Info("Connected to database successfully")
 
 	// Resolve the necessary ports
 	grpcPort, exists := envConfig.GetProperty(config.PropertyNameGRPCPort)

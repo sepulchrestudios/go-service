@@ -16,7 +16,7 @@ services:
       # and export them to the container, not load them directly into the file-based configuration map in the service
       LOAD_ENV_FROM_FILE: false
       # Use go-db-server-secret defined in the "secrets" section below
-      DB_PASSWORD_FILE: /run/secrets/go-db-server-secret
+      DATABASE_PASSWORD_FILE: /run/secrets/go-db-server-secret
     env_file:
       - .env
     secrets:
