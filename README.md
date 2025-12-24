@@ -1,2 +1,39 @@
-# go-service
-The core layer that serves as a module dependency for the dedicated services, written in Go.
+# Sepulchre Studios - Go Service
+
+The core layer that is intended to serve as a module dependency for our dedicated services, written in Go.
+
+An example `main.go` file is provided to show a "liveness" server running and give you an idea of how to implement your own service startup sequence.
+
+This example service runs within the provided development containers, configured within the `docker-compose.yml` file.
+
+## Configuration
+
+### Generating the Protocol Buffer Files
+
+```
+make proto
+```
+
+**NOTE:** you should **only** need to do this if you have actively changed the source `proto/*.proto` files in some way.
+
+### Copying Environment Configuration Files
+
+```
+make copy-env
+```
+
+**NOTE:** this is **not** required to be done prior to running `make start`, as it is handled automatically.
+
+## Development Containers
+
+### Starting the Containers
+
+```
+make start
+```
+
+### Stopping the Containers
+
+```
+make stop
+```
