@@ -33,17 +33,23 @@ type LivenessServer struct {
 	// ReadinessFunction is the function that will execute when the readiness check runs. By default, this just returns
 	// a success response with a nil error but it can be reassigned to a custom implementation per-service.
 	ReadinessFunction func() (*pb.ReadinessResponse, error)
+
+	// readinessChannel is the channel used to signal readiness (i.e. a response from ReadinessFunction).
+	readinessChannel chan struct{}
 }
 
 // NewLivenessServer creates and returns a new LivenessServer struct instance.
 func NewLivenessServer() *LivenessServer {
+	readinessChannel := make(chan struct{})
 	return &LivenessServer{
 		LivenessFunction: func() (*pb.LivenessResponse, error) {
 			return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
 		},
 		ReadinessFunction: func() (*pb.ReadinessResponse, error) {
+			<-readinessChannel
 			return &pb.ReadinessResponse{Message: ReadinessResponseMessageSuccess}, nil
 		},
+		readinessChannel: readinessChannel,
 	}
 }
 
@@ -58,6 +64,8 @@ func RegisterLivenessServerHandlers(ctx context.Context, mux *runtime.ServeMux, 
 	return pb.RegisterLivenessServiceHandler(ctx, mux, conn)
 }
 
+// Live performs the liveness check by invoking LivenessFunction. If no custom function is provided, it returns
+// a success response by default.
 func (l *LivenessServer) Live(ctx context.Context, req *pb.LivenessRequest) (*pb.LivenessResponse, error) {
 	if l.LivenessFunction == nil {
 		return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
@@ -69,6 +77,13 @@ func (l *LivenessServer) Live(ctx context.Context, req *pb.LivenessRequest) (*pb
 	return resp, nil
 }
 
+// MarkReady signals that the service is ready to receive traffic.
+func (l *LivenessServer) MarkReady() {
+	close(l.readinessChannel)
+}
+
+// Ready performs the readiness check by invoking ReadinessFunction. If no custom function is provided, it returns
+// a success response by default.
 func (l *LivenessServer) Ready(ctx context.Context, req *pb.ReadinessRequest) (*pb.ReadinessResponse, error) {
 	if l.ReadinessFunction == nil {
 		return &pb.ReadinessResponse{Message: ReadinessResponseMessageSuccess}, nil

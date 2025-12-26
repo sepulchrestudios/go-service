@@ -161,5 +161,13 @@ func main() {
 	}
 
 	logger.Info(fmt.Sprintf("Serving gRPC-Gateway on http://0.0.0.0:%s", httpPort))
-	logger.Fatal(gwServer.ListenAndServe().Error())
+	logger.Fatal(func() string {
+		// Signal that we are ready to receive traffic and then serve the endpoints
+		livenessServer.MarkReady()
+		err := gwServer.ListenAndServe()
+		if err != nil {
+			return err.Error()
+		}
+		return "Finished"
+	}())
 }
