@@ -18,11 +18,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Connect to the Postgres database using the provided environment configuration. Returns the database connection
-// instance plus any error that may have occurred.
-func connectToPostgresDBFromConfig(
+// Connect to the intended database using the provided environment configuration. Returns the database connection plus
+// plus any error that may have occurred.
+func connectToDatabaseFromConfig(
 	envConfig config.Config, isDebugModeActive bool,
-) (*database.DatabaseConnection, error) {
+) (database.DatabaseConnectionInterface, error) {
 	// Resolve the DB password from either a file path or the direct property
 	var dbPassword string
 	dbPasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameDatabasePasswordFile)
@@ -105,7 +105,7 @@ func main() {
 
 	// Create the database connection here
 	logger.Info("Connecting to database...")
-	_, err = connectToPostgresDBFromConfig(envConfig, isDebugModeActive)
+	_, err = connectToDatabaseFromConfig(envConfig, isDebugModeActive)
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Cannot connect to database: %v", err))
 	}
