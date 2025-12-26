@@ -19,7 +19,7 @@ import (
 )
 
 // Connect to the intended database using the provided environment configuration. Returns the database connection plus
-// plus any error that may have occurred.
+// any error that may have occurred.
 func connectToDatabaseFromConfig(
 	envConfig config.Config, isDebugModeActive bool,
 ) (database.DatabaseConnectionInterface, error) {
