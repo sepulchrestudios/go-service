@@ -12,6 +12,10 @@ proto:
 		--grpc-gateway_out ./src/proto --grpc-gateway_opt paths=source_relative \
 		./proto/*.proto
 
+# Builds the Go server Docker image without using cache
+build: copy-env
+	docker-compose build --no-cache go-server
+
 # Starts the Docker containers in detached mode after attempting to copy the env files
 start: copy-env
 	docker-compose up -d

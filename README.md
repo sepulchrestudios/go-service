@@ -26,6 +26,12 @@ make copy-env
 
 ## Development Containers
 
+### Building the Go Server
+
+```
+make build
+```
+
 ### Starting the Containers
 
 ```
