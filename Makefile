@@ -20,8 +20,11 @@ build: copy-env
 start: copy-env
 	docker-compose up -d
 
+# Builds the Go server Docker image and starts the containers in one step for development
+dev: build start
+
 # Stops and removes the Docker containers
 stop:
 	docker-compose down
 
-.PHONY: copy-env proto start stop
+.PHONY: build copy-env dev proto start stop

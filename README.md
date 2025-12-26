@@ -38,6 +38,12 @@ make build
 make start
 ```
 
+### Building the Go Server and Starting the Containers
+
+```
+make dev
+```
+
 ### Stopping the Containers
 
 ```
