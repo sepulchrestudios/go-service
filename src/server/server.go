@@ -12,7 +12,7 @@ type Server interface {
 	Live(ctx context.Context, req *pb.LivenessRequest) (*pb.LivenessResponse, error)
 
 	// MarkReady signals that the service is ready to receive traffic.
-	MarkReady()
+	MarkReady() error
 
 	// Ready performs the readiness check.
 	Ready(ctx context.Context, req *pb.ReadinessRequest) (*pb.ReadinessResponse, error)

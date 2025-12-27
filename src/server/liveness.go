@@ -3,81 +3,48 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	pb "github.com/sepulchrestudios/go-service/src/proto"
+	"github.com/sepulchrestudios/go-service/src/service"
 )
 
-// ErrFailedLivenessCheck is a sentinel error representing a failed liveness check.
-var ErrFailedLivenessCheck = errors.New("liveness check failed")
-
-// ErrFailedReadinessCheck is a sentinel error representing a failed readiness check.
-var ErrFailedReadinessCheck = errors.New("readiness check failed")
-
-// LivenessResponseMessageSuccess represents the "success" message for the liveness endpoint.
-const LivenessResponseMessageSuccess string = "ok"
-
-// ReadinessResponseMessageSuccess represents the "success" message for the readiness endpoint.
-const ReadinessResponseMessageSuccess string = LivenessResponseMessageSuccess
+// ErrNilLivenessService is a sentinel error representing a nil liveness service.
+var ErrNilLivenessService = errors.New("liveness service is nil")
 
 // LivenessServer represents the implementation of the "liveness" endpoints for gRPC and HTTP.
 type LivenessServer struct {
 	pb.UnimplementedLivenessServiceServer
 
-	// LivenessFunction is the function that will execute when the liveness check runs. By default, this just returns
-	// a success response with a nil error but it can be reassigned to a custom implementation per-service.
-	LivenessFunction func() (*pb.LivenessResponse, error)
-
-	// ReadinessFunction is the function that will execute when the readiness check runs. By default, this just returns
-	// a success response with a nil error but it can be reassigned to a custom implementation per-service.
-	ReadinessFunction func() (*pb.ReadinessResponse, error)
-
-	// readinessChannel is the channel used to signal readiness (i.e. a response from ReadinessFunction).
-	readinessChannel chan struct{}
+	// livenessService is the underlying liveness service implementation.
+	livenessService service.LivenessServiceInterface
 }
 
 // NewLivenessServer creates and returns a new LivenessServer struct instance.
-func NewLivenessServer() *LivenessServer {
-	readinessChannel := make(chan struct{})
+func NewLivenessServer(livenessService service.LivenessServiceInterface) *LivenessServer {
 	return &LivenessServer{
-		LivenessFunction: func() (*pb.LivenessResponse, error) {
-			return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
-		},
-		ReadinessFunction: func() (*pb.ReadinessResponse, error) {
-			<-readinessChannel
-			return &pb.ReadinessResponse{Message: ReadinessResponseMessageSuccess}, nil
-		},
-		readinessChannel: readinessChannel,
+		livenessService: livenessService,
 	}
 }
 
-// Live performs the liveness check by invoking LivenessFunction. If no custom function is provided, it returns
-// a success response by default.
+// Live performs the liveness check. Returns the response message and any error that may have occurred.
 func (l *LivenessServer) Live(ctx context.Context, req *pb.LivenessRequest) (*pb.LivenessResponse, error) {
-	if l.LivenessFunction == nil {
-		return &pb.LivenessResponse{Message: LivenessResponseMessageSuccess}, nil
+	if l.livenessService == nil {
+		return nil, ErrNilLivenessService
 	}
-	resp, err := l.LivenessFunction()
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedLivenessCheck, err)
-	}
-	return resp, nil
+	resp, err := l.livenessService.DoLivenessCheck()
+	return &pb.LivenessResponse{Message: string(resp)}, err
 }
 
 // MarkReady signals that the service is ready to receive traffic.
-func (l *LivenessServer) MarkReady() {
-	close(l.readinessChannel)
+func (l *LivenessServer) MarkReady() error {
+	return l.livenessService.DoMarkReady()
 }
 
-// Ready performs the readiness check by invoking ReadinessFunction. If no custom function is provided, it returns
-// a success response by default.
+// Ready performs the readiness check. Returns the response message and any error that may have occurred.
 func (l *LivenessServer) Ready(ctx context.Context, req *pb.ReadinessRequest) (*pb.ReadinessResponse, error) {
-	if l.ReadinessFunction == nil {
-		return &pb.ReadinessResponse{Message: ReadinessResponseMessageSuccess}, nil
+	if l.livenessService == nil {
+		return nil, ErrNilLivenessService
 	}
-	resp, err := l.ReadinessFunction()
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedReadinessCheck, err)
-	}
-	return resp, nil
+	resp, err := l.livenessService.DoReadinessCheck()
+	return &pb.ReadinessResponse{Message: string(resp)}, err
 }

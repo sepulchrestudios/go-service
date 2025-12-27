@@ -14,6 +14,7 @@ import (
 	"github.com/sepulchrestudios/go-service/src/database"
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
 	"github.com/sepulchrestudios/go-service/src/server"
+	"github.com/sepulchrestudios/go-service/src/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -129,7 +130,7 @@ func main() {
 
 	// Create a gRPC server object and liveness server object, then attach them
 	grpcServer := grpc.NewServer()
-	livenessServer := server.NewLivenessServer()
+	livenessServer := server.NewLivenessServer(service.NewLivenessService())
 	server.RegisterLivenessServer(grpcServer, livenessServer)
 
 	// Serve gRPC server
@@ -163,8 +164,11 @@ func main() {
 	logger.Info(fmt.Sprintf("Serving gRPC-Gateway on http://0.0.0.0:%s", httpPort))
 	logger.Fatal(func() string {
 		// Signal that we are ready to receive traffic and then serve the endpoints
-		livenessServer.MarkReady()
-		err := gwServer.ListenAndServe()
+		err := livenessServer.MarkReady()
+		if err != nil {
+			return err.Error()
+		}
+		err = gwServer.ListenAndServe()
 		if err != nil {
 			return err.Error()
 		}
