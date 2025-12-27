@@ -6,8 +6,8 @@ import (
 	pb "github.com/sepulchrestudios/go-service/src/proto"
 )
 
-// Server represents the interface for a liveness and readiness server.
-type Server interface {
+// LivenessServerInterface represents the interface for a liveness and readiness server.
+type LivenessServerInterface interface {
 	// Live performs the liveness check.
 	Live(ctx context.Context, req *pb.LivenessRequest) (*pb.LivenessResponse, error)
 
