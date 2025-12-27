@@ -49,7 +49,7 @@ func NewLivenessService() *LivenessService {
 // DoLivenessCheck performs the liveness check by invoking LivenessFunction. If no custom function is provided, it
 // returns a success response by default.
 func (l *LivenessService) DoLivenessCheck() ([]byte, error) {
-	if l.LivenessFunction == nil {
+	if l == nil || l.LivenessFunction == nil {
 		return []byte(LivenessResponseMessageSuccess), nil
 	}
 	resp, err := l.LivenessFunction()
@@ -61,6 +61,9 @@ func (l *LivenessService) DoLivenessCheck() ([]byte, error) {
 
 // DoMarkReady signals that the service is ready to receive traffic.
 func (l *LivenessService) DoMarkReady() error {
+	if l == nil {
+		return nil
+	}
 	close(l.readinessChannel)
 	return nil
 }
@@ -68,7 +71,7 @@ func (l *LivenessService) DoMarkReady() error {
 // DoReadinessCheck performs the readiness check by invoking ReadinessFunction. If no custom function is provided, it
 // returns a success response by default.
 func (l *LivenessService) DoReadinessCheck() ([]byte, error) {
-	if l.ReadinessFunction == nil {
+	if l == nil || l.ReadinessFunction == nil {
 		return []byte(ReadinessResponseMessageSuccess), nil
 	}
 	resp, err := l.ReadinessFunction()
