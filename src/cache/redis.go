@@ -54,7 +54,7 @@ func NewRedis(ctx context.Context, connectionArguments *RedisConnectionArguments
 	redisOptions := &redis.Options{
 		Addr: connectionArguments.Addr,
 	}
-	databaseID, err := strconv.ParseInt(connectionArguments.CacheName, 10, 64)
+	databaseID, err := strconv.ParseInt(connectionArguments.CacheIdentifier, 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrRedisCannotParseDatabaseIDAsInteger, err)
 	}
@@ -92,7 +92,7 @@ func ValidateRedisConnectionArguments(connectionArguments *RedisConnectionArgume
 	if connectionArguments.Addr == "" {
 		return ErrRedisNoConnectionAddr
 	}
-	if connectionArguments.CacheName == "" {
+	if connectionArguments.CacheIdentifier == "" {
 		return ErrRedisNoConnectionDatabaseID
 	}
 	return nil
