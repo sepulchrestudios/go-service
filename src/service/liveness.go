@@ -1,15 +1,8 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 )
-
-// ErrFailedLivenessCheck is a sentinel error representing a failed liveness check.
-var ErrFailedLivenessCheck = errors.New("liveness check failed")
-
-// ErrFailedReadinessCheck is a sentinel error representing a failed readiness check.
-var ErrFailedReadinessCheck = errors.New("readiness check failed")
 
 // LivenessResponseMessageSuccess represents the "success" message for the liveness endpoint.
 const LivenessResponseMessageSuccess string = "ok"
