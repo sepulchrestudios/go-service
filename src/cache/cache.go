@@ -14,6 +14,9 @@ type CacheConnectionArguments struct {
 
 // Cache represents a generic interface for a caching mechanism.
 type Cache interface {
+	// Close closes the connection to the cache.
+	Close() error
+
 	// Delete removes the item associated with the given key from the cache.
 	Delete(ctx context.Context, key string) (int64, error)
 

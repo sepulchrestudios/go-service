@@ -86,6 +86,14 @@ func (r *Redis) Client() *redis.Client {
 	return r.client
 }
 
+// Close closes the Redis client connection.
+func (r *Redis) Close() error {
+	if r == nil || r.client == nil {
+		return nil
+	}
+	return r.client.Close()
+}
+
 // Delete destroys the item associated with the given key from the cache. The integer return value indicates the number
 // of items that were deleted.
 func (r *Redis) Delete(ctx context.Context, key string) (int64, error) {
