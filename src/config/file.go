@@ -1,15 +1,10 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/joho/godotenv"
 )
-
-// ErrFailedLoadingConfigurationFile is a sentinel error representing a situation where the configuration file could
-// not be loaded for some reason.
-var ErrFailedLoadingConfigurationFile = errors.New("failed loading configuration file")
 
 // FileBasedConfig represents a set of mapped configuration values. It also contains a mutex so it should ONLY be
 // passed around by-reference and never by-value.
