@@ -78,6 +78,14 @@ func ValidateRedisConnectionArguments(connectionArguments *RedisConnectionArgume
 	return nil
 }
 
+// Client returns the underlying redis.Client pointer for this Redis cache instance for extendability purposes.
+func (r *Redis) Client() *redis.Client {
+	if r == nil {
+		return nil
+	}
+	return r.client
+}
+
 // Delete destroys the item associated with the given key from the cache. The integer return value indicates the number
 // of items that were deleted.
 func (r *Redis) Delete(ctx context.Context, key string) (int64, error) {
