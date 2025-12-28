@@ -2,7 +2,6 @@ package cache
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -10,29 +9,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// ErrRedisCannotConnect is a sentinel error describing a failure to connect to the Redis cache.
-var ErrRedisCannotConnect = errors.New("cannot connect to Redis cache")
-
-// ErrRedisCannotParseDatabaseIDAsInteger is a sentinel error describing a failure to parse the Redis database ID as
-// an integer.
-var ErrRedisCannotParseDatabaseIDAsInteger = errors.New("cannot parse Redis database ID as integer")
-
-// ErrRedisNoConnectionDatabaseAddr is a sentinel error representing a blank address string when attempting to make
-// a Redis cache connection.
-var ErrRedisNoConnectionAddr = errors.New("address in Redis connection arguments cannot be blank")
-
-// ErrRedisNoConnectionArguments is a sentinel error representing a nil connection arguments pointer when attempting
-// to make a Redis cache connection.
-var ErrRedisNoConnectionArguments = errors.New("connection arguments for Redis cannot be nil")
-
-// ErrRedisNoConnectionDatabaseID is a sentinel error representing a blank database ID string when attempting to make
-// a Redis cache connection.
-var ErrRedisNoConnectionDatabaseID = errors.New("database ID in Redis connection arguments cannot be blank")
-
 // RedisConnectionArguments is a struct representing the general properties expected when making a connection
 // to a Redis cache.
 type RedisConnectionArguments struct {
-	// CacheName in the embedded struct refers to the Redis database ID.
+	// CacheIdentifier in the embedded struct refers to the Redis database ID.
 	CacheConnectionArguments
 
 	Addr     string
@@ -76,7 +56,7 @@ func NewRedisWithOptions(ctx context.Context, options *redis.Options) (*Redis, e
 	client := redis.NewClient(options)
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrRedisCannotConnect, err)
+		return nil, fmt.Errorf("%w: %w", ErrCannotConnect, err)
 	}
 	return &Redis{
 		client: client,
@@ -89,11 +69,11 @@ func ValidateRedisConnectionArguments(connectionArguments *RedisConnectionArgume
 	if connectionArguments == nil {
 		return ErrRedisNoConnectionArguments
 	}
+	if connectionArguments.CacheIdentifier == "" {
+		return ErrNoCacheIdentifier
+	}
 	if connectionArguments.Addr == "" {
 		return ErrRedisNoConnectionAddr
-	}
-	if connectionArguments.CacheIdentifier == "" {
-		return ErrRedisNoConnectionDatabaseID
 	}
 	return nil
 }
