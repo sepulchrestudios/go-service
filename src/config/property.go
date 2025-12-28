@@ -7,11 +7,8 @@ const (
 	// PropertyNameCacheHost represents the cache host address.
 	PropertyNameCacheHost PropertyName = "CACHE_HOST"
 
-	// PropertyNameCachePort represents the cache port.
-	PropertyNameCachePort PropertyName = "CACHE_PORT"
-
-	// PropertyNameCacheName represents the cache name.
-	PropertyNameCacheName PropertyName = "CACHE_NAME"
+	// PropertyNameCacheIdentifier represents the cache identifier.
+	PropertyNameCacheIdentifier PropertyName = "CACHE_IDENTIFIER"
 
 	// PropertyNameCacheUsername represents the cache username.
 	PropertyNameCacheUsername PropertyName = "CACHE_USERNAME"
@@ -21,6 +18,9 @@ const (
 
 	// PropertyNameCachePasswordFile represents the file path from which to read the cache password.
 	PropertyNameCachePasswordFile PropertyName = "CACHE_PASSWORD_FILE"
+
+	// PropertyNameCachePort represents the cache port.
+	PropertyNameCachePort PropertyName = "CACHE_PORT"
 
 	// PropertyNameDatabaseHost represents the database host address.
 	PropertyNameDatabaseHost PropertyName = "DATABASE_HOST"
@@ -69,11 +69,11 @@ const (
 func GetAvailableConfigurationKeys() []PropertyName {
 	return []PropertyName{
 		PropertyNameCacheHost,
-		PropertyNameCachePort,
-		PropertyNameCacheName,
+		PropertyNameCacheIdentifier,
 		PropertyNameCacheUsername,
 		PropertyNameCachePassword,
 		PropertyNameCachePasswordFile,
+		PropertyNameCachePort,
 		PropertyNameDatabaseHost,
 		PropertyNameDatabaseName,
 		PropertyNameDatabasePassword,

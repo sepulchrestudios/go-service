@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/sepulchrestudios/go-service/src/cache"
 	"github.com/sepulchrestudios/go-service/src/config"
 	"github.com/sepulchrestudios/go-service/src/database"
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
@@ -18,6 +19,53 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+// Connect to the intended cache using the provided environment configuration. Returns the cache implementation plus
+// any error that may have occurred.
+func connectToCacheFromConfig(
+	ctx context.Context, envConfig config.Config, isDebugModeActive bool,
+) (cache.Cache, error) {
+	// Resolve the cache password from either a file path or the direct property
+	var cachePassword string
+	cachePasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameCachePasswordFile)
+	if exists && cachePasswordFilePath != "" {
+		passwordBytes, err := os.ReadFile(cachePasswordFilePath)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot read cache password from file path '%s': %v", cachePasswordFilePath, err)
+		}
+		cachePassword = string(passwordBytes)
+	} else {
+		// Cache password is optional so being completely blank regardless of existence is a valid scenario
+		cachePassword, _ = envConfig.GetProperty(config.PropertyNameCachePassword)
+	}
+
+	// Create the cache connection from the environment configuration
+	var cacheAddr string
+	cacheHost, exists := envConfig.GetProperty(config.PropertyNameCacheHost)
+	if !exists {
+		return nil, fmt.Errorf("Cannot read property from configuration: %s", config.PropertyNameCacheHost)
+	}
+	cachePort, _ := envConfig.GetProperty(config.PropertyNameCachePort)
+	if cachePort != "" {
+		cacheAddr = fmt.Sprintf("%s:%s", cacheHost, cachePort)
+	} else {
+		cacheAddr = cacheHost
+	}
+	cacheIdentifier, exists := envConfig.GetProperty(config.PropertyNameCacheIdentifier)
+	if !exists {
+		return nil, fmt.Errorf("Cannot read property from configuration: %s", config.PropertyNameCacheIdentifier)
+	}
+	cacheUsername, _ := envConfig.GetProperty(config.PropertyNameCacheUsername)
+	connectionArguments := &cache.RedisConnectionArguments{
+		CacheConnectionArguments: cache.CacheConnectionArguments{
+			CacheIdentifier: cacheIdentifier,
+		},
+		Addr:     cacheAddr,
+		Password: cachePassword,
+		Username: cacheUsername,
+	}
+	return cache.NewRedis(ctx, connectionArguments)
+}
 
 // Connect to the intended database using the provided environment configuration. Returns the database connection plus
 // any error that may have occurred.
@@ -111,6 +159,14 @@ func main() {
 		logger.Fatal(fmt.Sprintf("Cannot connect to database: %v", err))
 	}
 	logger.Info("Connected to database successfully")
+
+	// Create the cache connection here
+	logger.Info("Connecting to cache...")
+	_, err = connectToCacheFromConfig(context.Background(), envConfig, isDebugModeActive)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot connect to cache: %v", err))
+	}
+	logger.Info("Connected to cache successfully")
 
 	// Resolve the necessary ports
 	grpcPort, exists := envConfig.GetProperty(config.PropertyNameGRPCPort)

@@ -9,6 +9,8 @@ services:
     networks:
       - go-server-network
     depends_on:
+      go-server-cache:
+        condition: service_healthy
       go-server-db:
         condition: service_healthy
     environment:
@@ -21,6 +23,20 @@ services:
       - .env
     secrets:
       - go-db-server-secret
+  go-server-cache:
+    image: redis:8.4-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - go-server-network
+    healthcheck:
+      test: [
+        "CMD", "redis-cli", "ping",
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   go-server-db:
     image: postgres:18-alpine
     restart: unless-stopped
