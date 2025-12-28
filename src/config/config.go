@@ -6,6 +6,24 @@ import "sync"
 type PropertyName string
 
 const (
+	// PropertyNameCacheHost represents the cache host address.
+	PropertyNameCacheHost PropertyName = "CACHE_HOST"
+
+	// PropertyNameCachePort represents the cache port.
+	PropertyNameCachePort PropertyName = "CACHE_PORT"
+
+	// PropertyNameCacheName represents the cache name.
+	PropertyNameCacheName PropertyName = "CACHE_NAME"
+
+	// PropertyNameCacheUsername represents the cache username.
+	PropertyNameCacheUsername PropertyName = "CACHE_USERNAME"
+
+	// PropertyNameCachePassword represents the cache password.
+	PropertyNameCachePassword PropertyName = "CACHE_PASSWORD"
+
+	// PropertyNameCachePasswordFile represents the file path from which to read the cache password.
+	PropertyNameCachePasswordFile PropertyName = "CACHE_PASSWORD_FILE"
+
 	// PropertyNameDatabaseHost represents the database host address.
 	PropertyNameDatabaseHost PropertyName = "DATABASE_HOST"
 
@@ -52,6 +70,12 @@ const (
 // GetAvailableConfigurationKeys returns a slice of all available configuration property names.
 func GetAvailableConfigurationKeys() []PropertyName {
 	return []PropertyName{
+		PropertyNameCacheHost,
+		PropertyNameCachePort,
+		PropertyNameCacheName,
+		PropertyNameCacheUsername,
+		PropertyNameCachePassword,
+		PropertyNameCachePasswordFile,
 		PropertyNameDatabaseHost,
 		PropertyNameDatabaseName,
 		PropertyNameDatabasePassword,
