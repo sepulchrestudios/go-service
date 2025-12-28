@@ -2,14 +2,10 @@ package server
 
 import (
 	"context"
-	"errors"
 
 	pb "github.com/sepulchrestudios/go-service/src/proto"
 	"github.com/sepulchrestudios/go-service/src/service"
 )
-
-// ErrNilLivenessService is a sentinel error representing a nil liveness service.
-var ErrNilLivenessService = errors.New("liveness service is nil")
 
 // LivenessServer represents the implementation of the "liveness" endpoints for gRPC and HTTP.
 type LivenessServer struct {
