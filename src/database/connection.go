@@ -1,18 +1,10 @@
 package database
 
 import (
-	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
 )
-
-// ErrCannotOpenDatabaseConnection is a sentinel error describing a failure to open a database connection.
-var ErrCannotOpenDatabaseConnection = errors.New("cannot open database connection")
-
-// ErrNoDatabaseConnectionReturned is a sentinel error describing a nil database connection being returned from GORM
-// without an actual GORM error occurring at the same time.
-var ErrNoDatabaseConnectionReturned = errors.New("nil database connection returned from GORM")
 
 // DatabaseConnection is a struct representing an active DB connection.
 type DatabaseConnection struct {

@@ -1,29 +1,12 @@
 package database
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-// ErrPostgresNoConnectionArguments is a sentinel error representing a nil connection arguments pointer when attempting
-// to make a Postgres DB connection.
-var ErrPostgresNoConnectionArguments = errors.New("connection arguments for postgres cannot be nil")
-
-// ErrPostgresNoConnectionDatabaseHost is a sentinel error representing a blank database host string when attempting to
-// make a Postgres DB connection.
-var ErrPostgresNoConnectionDatabaseHost = errors.New("database host in connection arguments cannot be blank")
-
-// ErrPostgresNoConnectionDatabaseName is a sentinel error representing a blank database name string when attempting to
-// make a Postgres DB connection.
-var ErrPostgresNoConnectionDatabaseName = errors.New("database name in connection arguments cannot be blank")
-
-// ErrPostgresNoConnectionUsername is a sentinel error representing a blank username string when attempting to make a
-// Postgres DB connection.
-var ErrPostgresNoConnectionUsername = errors.New("username in connection arguments cannot be blank")
 
 // PostgresDatabaseConnectionArguments is a struct representing the properties expected when making a connection to a
 // Postgres database environment.
