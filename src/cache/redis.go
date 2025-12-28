@@ -116,14 +116,15 @@ func (r *Redis) Exists(ctx context.Context, key string) (bool, error) {
 	return result > 0, err
 }
 
-// Get retrieves the item associated with the given key from the cache.
+// Get retrieves the item associated with the given key from the cache. If the key could not be found, this method
+// returns nil.
 func (r *Redis) Get(ctx context.Context, key string) ([]byte, error) {
 	if r == nil || r.client == nil {
-		return []byte{}, nil
+		return nil, nil
 	}
 	result, err := r.client.Get(ctx, key).Bytes()
 	if err == redis.Nil {
-		return []byte{}, nil
+		return nil, nil
 	}
 	return result, err
 }
