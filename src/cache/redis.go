@@ -25,59 +25,6 @@ type Redis struct {
 	client *redis.Client
 }
 
-// NewRedis creates and returns a new Redis cache instance along with any error that may have occurred.
-func NewRedis(ctx context.Context, connectionArguments *RedisConnectionArguments) (*Redis, error) {
-	err := ValidateRedisConnectionArguments(connectionArguments)
-	if err != nil {
-		return nil, err
-	}
-	redisOptions := &redis.Options{
-		Addr: connectionArguments.Addr,
-	}
-	databaseID, err := strconv.ParseInt(connectionArguments.CacheIdentifier, 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrRedisCannotParseDatabaseIDAsInteger, err)
-	}
-	redisOptions.DB = int(databaseID)
-	// Set credentials provider if username or password is provided because auth is optional
-	if connectionArguments.Username != "" || connectionArguments.Password != "" {
-		redisOptions.CredentialsProviderContext = func(ctx context.Context) (string, string, error) {
-			return connectionArguments.Username, connectionArguments.Password, nil
-		}
-	}
-	return NewRedisWithOptions(ctx, redisOptions)
-}
-
-// NewRedisWithOptions creates and returns a new Redis cache instance along with any error that may have occurred.
-//
-// The provided redis.Options pointer is used to configure the underlying Redis client fully and to give additional
-// flexibility past what the NewRedis() function provides.
-func NewRedisWithOptions(ctx context.Context, options *redis.Options) (*Redis, error) {
-	client := redis.NewClient(options)
-	_, err := client.Ping(ctx).Result()
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCannotConnect, err)
-	}
-	return &Redis{
-		client: client,
-	}, nil
-}
-
-// ValidateRedisConnectionArguments takes a RedisConnectionArguments struct pointer and returns an error
-// if any of the expected fields are missing. Returns nil if the validation checks pass.
-func ValidateRedisConnectionArguments(connectionArguments *RedisConnectionArguments) error {
-	if connectionArguments == nil {
-		return ErrRedisNoConnectionArguments
-	}
-	if connectionArguments.CacheIdentifier == "" {
-		return ErrNoCacheIdentifier
-	}
-	if connectionArguments.Addr == "" {
-		return ErrRedisNoConnectionAddr
-	}
-	return nil
-}
-
 // Client returns the underlying redis.Client pointer for this Redis cache instance for extendability purposes.
 func (r *Redis) Client() *redis.Client {
 	if r == nil {
@@ -140,4 +87,57 @@ func (r *Redis) SetWithTTL(ctx context.Context, key string, value []byte, ttl ti
 		return nil
 	}
 	return r.client.Set(ctx, key, value, ttl).Err()
+}
+
+// NewRedis creates and returns a new Redis cache instance along with any error that may have occurred.
+func NewRedis(ctx context.Context, connectionArguments *RedisConnectionArguments) (*Redis, error) {
+	err := ValidateRedisConnectionArguments(connectionArguments)
+	if err != nil {
+		return nil, err
+	}
+	redisOptions := &redis.Options{
+		Addr: connectionArguments.Addr,
+	}
+	databaseID, err := strconv.ParseInt(connectionArguments.CacheIdentifier, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrRedisCannotParseDatabaseIDAsInteger, err)
+	}
+	redisOptions.DB = int(databaseID)
+	// Set credentials provider if username or password is provided because auth is optional
+	if connectionArguments.Username != "" || connectionArguments.Password != "" {
+		redisOptions.CredentialsProviderContext = func(ctx context.Context) (string, string, error) {
+			return connectionArguments.Username, connectionArguments.Password, nil
+		}
+	}
+	return NewRedisWithOptions(ctx, redisOptions)
+}
+
+// NewRedisWithOptions creates and returns a new Redis cache instance along with any error that may have occurred.
+//
+// The provided redis.Options pointer is used to configure the underlying Redis client fully and to give additional
+// flexibility past what the NewRedis() function provides.
+func NewRedisWithOptions(ctx context.Context, options *redis.Options) (*Redis, error) {
+	client := redis.NewClient(options)
+	_, err := client.Ping(ctx).Result()
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrCannotConnect, err)
+	}
+	return &Redis{
+		client: client,
+	}, nil
+}
+
+// ValidateRedisConnectionArguments takes a RedisConnectionArguments struct pointer and returns an error
+// if any of the expected fields are missing. Returns nil if the validation checks pass.
+func ValidateRedisConnectionArguments(connectionArguments *RedisConnectionArguments) error {
+	if connectionArguments == nil {
+		return ErrRedisNoConnectionArguments
+	}
+	if connectionArguments.CacheIdentifier == "" {
+		return ErrNoCacheIdentifier
+	}
+	if connectionArguments.Addr == "" {
+		return ErrRedisNoConnectionAddr
+	}
+	return nil
 }
