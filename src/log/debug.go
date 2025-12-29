@@ -36,6 +36,17 @@ func (l *DebugLogger) Sync() error {
 	return l.logger.Sync()
 }
 
+// WithOptions clones the existing logger, applies the provided options, and returns a new resultant logger.
+func (l *DebugLogger) WithOptions(opts ...zap.Option) *DebugLogger {
+	if l == nil || l.logger == nil {
+		return nil
+	}
+	logger := l.logger.WithOptions(opts...)
+	return &DebugLogger{
+		logger: logger,
+	}
+}
+
 // NewDebugLogger takes a set of zap options and returns a new DebugLogger instance as well as any error that may
 // have occurred when attempting to create said logger.
 func NewDebugLogger(options ...zap.Option) (*DebugLogger, error) {

@@ -9,7 +9,7 @@ import (
 
 // StandardLogger represents a struct that provides logging capabilities.
 type StandardLogger struct {
-	debugLogger *DebugLogger
+	debugLogger DebugContract
 	debugMode   bool
 	logger      *zap.Logger
 }
@@ -133,6 +133,18 @@ func (l *StandardLogger) Warn(msg string, fields ...zap.Field) {
 	l.logger.Warn(msg, fields...)
 }
 
+// WithDebugLogger clones the existing logger, applies the provided debug logger, and returns a new resultant logger.
+func (l *StandardLogger) WithDebugLogger(debugLogger DebugContract) *StandardLogger {
+	if l == nil || l.logger == nil {
+		return nil
+	}
+	return &StandardLogger{
+		debugLogger: debugLogger,
+		debugMode:   l.debugMode,
+		logger:      l.logger.WithOptions(),
+	}
+}
+
 // WithOptions clones the existing logger, applies the provided options, and returns a new resultant logger.
 func (l *StandardLogger) WithOptions(opts ...zap.Option) *StandardLogger {
 	if l == nil || l.logger == nil {
@@ -140,11 +152,9 @@ func (l *StandardLogger) WithOptions(opts ...zap.Option) *StandardLogger {
 	}
 	logger := l.logger.WithOptions(opts...)
 	return &StandardLogger{
-		debugLogger: &DebugLogger{
-			logger: logger,
-		},
-		debugMode: l.debugMode,
-		logger:    logger,
+		debugLogger: l.debugLogger,
+		debugMode:   l.debugMode,
+		logger:      logger,
 	}
 }
 
