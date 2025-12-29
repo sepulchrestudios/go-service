@@ -5,13 +5,19 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Contract is an interface that represents a zap-based logger.
-type Contract interface {
+// DebugContract is an interface that represents a zap-based debug-level logger.
+type DebugContract interface {
 	// Debug logs a message at debug-level.
 	Debug(msg string, fields ...zap.Field)
 
 	// DPanic logs a development panic message. If the logger is in development mode, a panic is also raised.
 	DPanic(msg string, fields ...zap.Field)
+}
+
+// Contract is an interface that represents a zap-based logger.
+type Contract interface {
+	// Full logger implementations should also allow for debug-level logging.
+	DebugContract
 
 	// Error logs a message at error-level.
 	Error(msg string, fields ...zap.Field)

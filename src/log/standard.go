@@ -9,56 +9,25 @@ import (
 
 // StandardLogger represents a struct that provides logging capabilities.
 type StandardLogger struct {
-	debugMode bool
-	logger    *zap.Logger
-}
-
-// NewLogger takes a boolean describing whether "debug / development mode" should be turned on, plus a set of zap
-// options, and returns a new Logger instance as well as any error that may have occurred when attempting to create
-// said logger.
-func NewStandardLogger(shouldUseDebugMode bool, options ...zap.Option) (*StandardLogger, error) {
-	var logger *zap.Logger
-	var err error
-	if shouldUseDebugMode {
-		logger, err = zap.NewDevelopment(options...)
-	} else {
-		logger, err = zap.NewProduction(options...)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCannotCreateLogger, err)
-	}
-	return &StandardLogger{
-		debugMode: shouldUseDebugMode,
-		logger:    logger,
-	}, nil
-}
-
-// NewStandardLoggerFromZapLogger takes an existing zap logger pointer and returns a new Logger instance plus any error
-// that may have occurred.
-func NewStandardLoggerFromZapLogger(logger *zap.Logger) (*StandardLogger, error) {
-	if logger == nil {
-		return nil, ErrZapLoggerCannotBeNil
-	}
-	return &StandardLogger{
-		debugMode: logger.Core().Enabled(zapcore.DebugLevel),
-		logger:    logger,
-	}, nil
+	debugLogger *DebugLogger
+	debugMode   bool
+	logger      *zap.Logger
 }
 
 // Debug logs a message at debug-level.
 func (l *StandardLogger) Debug(msg string, fields ...zap.Field) {
-	if l == nil || l.logger == nil {
+	if l == nil || l.debugLogger == nil {
 		return
 	}
-	l.logger.Debug(msg, fields...)
+	l.debugLogger.Debug(msg, fields...)
 }
 
 // DPanic logs a development panic message. If the logger is in development mode, a panic is also raised.
 func (l *StandardLogger) DPanic(msg string, fields ...zapcore.Field) {
-	if l == nil || l.logger == nil {
+	if l == nil || l.debugLogger == nil {
 		return
 	}
-	l.logger.DPanic(msg, fields...)
+	l.debugLogger.DPanic(msg, fields...)
 }
 
 // Error logs a message at error-level.
@@ -146,8 +115,54 @@ func (l *StandardLogger) WithOptions(opts ...zap.Option) *StandardLogger {
 	if l == nil || l.logger == nil {
 		return nil
 	}
+	logger := l.logger.WithOptions(opts...)
 	return &StandardLogger{
+		debugLogger: &DebugLogger{
+			logger: logger,
+		},
 		debugMode: l.debugMode,
-		logger:    l.logger.WithOptions(opts...),
+		logger:    logger,
 	}
+}
+
+// NewStandardLogger takes a boolean describing whether "debug / development mode" should be turned on, plus a set of
+// zap options, and returns a new StandardLogger instance as well as any error that may have occurred when attempting
+// to createsaid logger.
+func NewStandardLogger(shouldUseDebugMode bool, options ...zap.Option) (*StandardLogger, error) {
+	var logger *zap.Logger
+	var err error
+	if shouldUseDebugMode {
+		logger, err = zap.NewDevelopment(options...)
+	} else {
+		logger, err = zap.NewProduction(options...)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrCannotCreateLogger, err)
+	}
+	debugLogger, err := NewDebugLoggerFromZapLogger(logger)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrCannotCreateDebugLogger, err)
+	}
+	return &StandardLogger{
+		debugLogger: debugLogger,
+		debugMode:   shouldUseDebugMode,
+		logger:      logger,
+	}, nil
+}
+
+// NewStandardLoggerFromZapLogger takes an existing zap logger pointer and returns a new Logger instance plus any error
+// that may have occurred.
+func NewStandardLoggerFromZapLogger(logger *zap.Logger) (*StandardLogger, error) {
+	if logger == nil {
+		return nil, ErrZapLoggerCannotBeNil
+	}
+	debugLogger, err := NewDebugLoggerFromZapLogger(logger)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrCannotCreateDebugLogger, err)
+	}
+	return &StandardLogger{
+		debugLogger: debugLogger,
+		debugMode:   logger.Core().Enabled(zapcore.DebugLevel),
+		logger:      logger,
+	}, nil
 }

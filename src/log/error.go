@@ -2,6 +2,9 @@ package log
 
 import "errors"
 
+// ErrCannotCreateDebugLogger is a sentinel error representing a failure to create a debug logger.
+var ErrCannotCreateDebugLogger = errors.New("cannot create debug logger")
+
 // ErrCannotCreateLogger is a sentinel error representing a failure to create a logger.
 var ErrCannotCreateLogger = errors.New("cannot create logger")
 
