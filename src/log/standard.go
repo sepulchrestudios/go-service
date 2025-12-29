@@ -117,7 +117,7 @@ func (l *StandardLogger) Sync() error {
 	var fullSyncErr error
 	for _, syncErr := range syncErrors {
 		if fullSyncErr == nil {
-			fullSyncErr = fmt.Errorf("%w", syncErr)
+			fullSyncErr = syncErr
 		} else {
 			fullSyncErr = fmt.Errorf("%w: %w", fullSyncErr, syncErr)
 		}
