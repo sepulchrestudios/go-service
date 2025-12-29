@@ -23,8 +23,8 @@ import (
 // Connect to the intended cache using the provided environment configuration. Returns the cache implementation plus
 // any error that may have occurred.
 func connectToCacheFromConfig(
-	ctx context.Context, envConfig config.Config, isDebugModeActive bool,
-) (cache.Cache, error) {
+	ctx context.Context, envConfig config.Contract, isDebugModeActive bool,
+) (cache.Contract, error) {
 	// Resolve the cache password from either a file path or the direct property
 	var cachePassword string
 	cachePasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameCachePasswordFile)
@@ -70,8 +70,8 @@ func connectToCacheFromConfig(
 // Connect to the intended database using the provided environment configuration. Returns the database connection plus
 // any error that may have occurred.
 func connectToDatabaseFromConfig(
-	envConfig config.Config, isDebugModeActive bool,
-) (database.DatabaseConnectionInterface, error) {
+	envConfig config.Contract, isDebugModeActive bool,
+) (database.Contract, error) {
 	// Resolve the DB password from either a file path or the direct property
 	var dbPassword string
 	dbPasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameDatabasePasswordFile)
@@ -123,7 +123,7 @@ func main() {
 	// Much of this comes from the barebones gRPC Gateway functionality:
 	// https://grpc-ecosystem.github.io/grpc-gateway/docs/tutorials/adding_annotations/#using-protoc
 
-	var envConfig config.Config
+	var envConfig config.Contract
 	var err error
 
 	// Determine whether to load environment configuration from a file or directly from environment variables

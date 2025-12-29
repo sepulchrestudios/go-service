@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// Cache represents a generic interface for a caching mechanism.
-type Cache interface {
+// Contract represents a generic interface for a caching mechanism.
+type Contract interface {
 	// Close closes the connection to the cache.
 	Close() error
 

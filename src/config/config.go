@@ -1,7 +1,7 @@
 package config
 
-// Config is an interface that represents a configuration source for the application.
-type Config interface {
+// Contract is an interface that represents a configuration source for the application.
+type Contract interface {
 	// GetAllProperties returns a copy of the map that represents all configuration values.
 	GetAllProperties() map[string]string
 

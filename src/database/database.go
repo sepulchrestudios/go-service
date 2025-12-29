@@ -4,8 +4,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// DatabaseConnectionInterface represents the interface that all database connection implementations must satisfy.
-type DatabaseConnectionInterface interface {
+// Contract represents the interface that all database connection implementations must satisfy.
+type Contract interface {
 	// GetGORMDB returns the GORM DB pointer for the connection.
 	GetGORMDB() *gorm.DB
 

@@ -4,8 +4,8 @@ import (
 	"context"
 )
 
-// HTTPAwareClient is an interface that represents a client used for performing HTTP operations.
-type HTTPAwareClient interface {
+// Contract is an interface that represents a client used for performing HTTP operations.
+type Contract interface {
 	// GetDefaultHeaders returns a map containing the headers that are included with every request by default.
 	GetDefaultHeaders() map[string]string
 

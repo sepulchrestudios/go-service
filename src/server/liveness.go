@@ -12,11 +12,11 @@ type LivenessServer struct {
 	pb.UnimplementedLivenessServiceServer
 
 	// livenessService is the underlying liveness service implementation.
-	livenessService service.LivenessServiceInterface
+	livenessService service.Contract
 }
 
 // NewLivenessServer creates and returns a new LivenessServer struct instance.
-func NewLivenessServer(livenessService service.LivenessServiceInterface) *LivenessServer {
+func NewLivenessServer(livenessService service.Contract) *LivenessServer {
 	return &LivenessServer{
 		livenessService: livenessService,
 	}

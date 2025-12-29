@@ -1,7 +1,7 @@
 package service
 
-// LivenessServiceInterface represents the interface that all liveness service implementations must satisfy.
-type LivenessServiceInterface interface {
+// Contract represents the interface that all liveness service implementations must satisfy.
+type Contract interface {
 	// DoLivenessCheck performs the liveness check.
 	DoLivenessCheck() ([]byte, error)
 
