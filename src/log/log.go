@@ -12,6 +12,9 @@ type DebugContract interface {
 
 	// DPanic logs a development panic message. If the logger is in development mode, a panic is also raised.
 	DPanic(msg string, fields ...zap.Field)
+
+	// Sync flushes any buffered log entries. This should be called before application exit.
+	Sync() error
 }
 
 // Contract is an interface that represents a zap-based logger.

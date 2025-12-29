@@ -99,7 +99,30 @@ func (l *StandardLogger) Sync() error {
 	if l == nil || l.logger == nil {
 		return nil
 	}
-	return l.logger.Sync()
+
+	// sync the logger(s) and track any error(s) that occurred
+	syncErrors := []error{}
+	err := l.logger.Sync()
+	if err != nil {
+		syncErrors = append(syncErrors, err)
+	}
+	if l.debugLogger != nil {
+		err = l.debugLogger.Sync()
+		if err != nil {
+			syncErrors = append(syncErrors, err)
+		}
+	}
+
+	// build the final chained error (if any)
+	var fullSyncErr error
+	for _, syncErr := range syncErrors {
+		if fullSyncErr == nil {
+			fullSyncErr = fmt.Errorf("%w", syncErr)
+		} else {
+			fullSyncErr = fmt.Errorf("%w: %w", fullSyncErr, syncErr)
+		}
+	}
+	return fullSyncErr
 }
 
 // Warn logs a message at warn-level.
