@@ -23,7 +23,7 @@ import (
 // Connect to the intended cache using the provided environment configuration. Returns the cache implementation plus
 // any error that may have occurred.
 func connectToCacheFromConfig(
-	ctx context.Context, envConfig config.Contract, isDebugModeActive bool,
+	ctx context.Context, envConfig config.Contract, isDebugModeActive bool, debugLogger servicelogger.DebugContract,
 ) (cache.Contract, error) {
 	// Resolve the cache password from either a file path or the direct property
 	var cachePassword string
@@ -64,7 +64,14 @@ func connectToCacheFromConfig(
 		Password: cachePassword,
 		Username: cacheUsername,
 	}
-	return cache.NewRedis(ctx, connectionArguments)
+	cacheImplementation, err := cache.NewRedis(ctx, connectionArguments)
+	if err != nil {
+		return nil, err
+	}
+	if isDebugModeActive {
+		return cache.NewDebug(cacheImplementation, debugLogger), nil
+	}
+	return cacheImplementation, nil
 }
 
 // Connect to the intended database using the provided environment configuration. Returns the database connection plus
@@ -162,7 +169,8 @@ func main() {
 
 	// Create the cache connection here
 	logger.Info("Connecting to cache...")
-	_, err = connectToCacheFromConfig(context.Background(), envConfig, isDebugModeActive)
+	ctx := context.Background()
+	_, err = connectToCacheFromConfig(ctx, envConfig, isDebugModeActive, logger)
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Cannot connect to cache: %v", err))
 	}
