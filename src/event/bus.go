@@ -46,6 +46,7 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 	if b.pipeline == nil {
 		return ErrCannotPumpEvents
 	}
+	// TODO: use goroutines to make this concurrent
 	for {
 		select {
 		case <-ctx.Done():
@@ -78,6 +79,8 @@ func (b *Bus) Receive(event EventContract) error {
 	// Ensure we don't get a collision if two or more goroutines try to read concurrently
 	b.handlersMu.Lock()
 	defer b.handlersMu.Unlock()
+
+	// TODO: use goroutines to make this concurrent
 
 	// Invoke handlers registered for the specific event type first.
 	processingErrChan := make(chan error)
