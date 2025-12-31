@@ -10,6 +10,8 @@ type HandlerFunc func(event EventContract) EventResultContract
 
 // Bus is a simple concurrent in-memory implementation of an event bus. It also contains a mutex so it should ONLY be
 // passed around by-reference and never by-value.
+//
+// Under the hood, it essentially implements the Publisher-Subscriber and Observer design patterns.
 type Bus struct {
 	handlers   map[EventType][]HandlerFunc
 	handlersMu sync.Mutex
@@ -53,7 +55,7 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 			if event != nil {
 				// Process each event in its own goroutine to avoid creating a blocking queue.
 				go func(e EventContract) {
-					results := b.Receive(e)
+					results := b.Subscribe(e)
 					for _, result := range results {
 						b.resultChan <- result
 					}
@@ -63,8 +65,8 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 	}
 }
 
-// Receive receives an event from the bus and processes it.
-func (b *Bus) Receive(event EventContract) []EventResultContract {
+// Subscribe receives an event from the bus and processes it.
+func (b *Bus) Subscribe(event EventContract) []EventResultContract {
 	if b == nil || b.handlers == nil || event == nil {
 		return []EventResultContract{}
 	}

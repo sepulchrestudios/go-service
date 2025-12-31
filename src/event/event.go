@@ -17,18 +17,18 @@ type BusPublisherContract interface {
 	Publish(event EventContract) error
 }
 
-// BusReceiverContract defines the interface for receiving events from a bus.
-type BusReceiverContract interface {
-	// Receive receives an event from the bus.
+// BusSubscriberContract defines the interface for receiving events from a bus.
+type BusSubscriberContract interface {
+	// Subscribe receives an event from the bus.
 	//
 	// This is generally where the event-specific handlers would be invoked.
-	Receive(event EventContract) error
+	Subscribe(event EventContract) error
 }
 
 // BusContract defines the interface for an event bus that can publish and subscribe to events.
 type BusContract interface {
 	BusPublisherContract
-	BusReceiverContract
+	BusSubscriberContract
 }
 
 // EventContract defines the interface for a general event that can be processed.
