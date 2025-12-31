@@ -39,6 +39,8 @@ func (b *Bus) Publish(event EventContract) error {
 }
 
 // PumpEvents continuously pumps events from the internal pipeline for processing until the provided context is done.
+//
+// This method BLOCKS until ctx.Done() is closed, so it should be run in its own goroutine.
 func (b *Bus) PumpEvents(ctx context.Context) error {
 	if b == nil {
 		return ErrBusCannotBeNil
@@ -46,7 +48,6 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 	if b.pipeline == nil {
 		return ErrCannotPumpEvents
 	}
-	// TODO: use goroutines to make this concurrent
 	for {
 		select {
 		case <-ctx.Done():
@@ -56,9 +57,12 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 				b.errorChan = make(chan error)
 			}
 			if event != nil {
-				if err := b.Receive(event); err != nil {
-					b.errorChan <- err
-				}
+				// Process each event in its own goroutine to avoid creating a blocking queue.
+				go func(e EventContract) {
+					if err := b.Receive(e); err != nil {
+						b.errorChan <- err
+					}
+				}(event)
 			}
 		}
 	}
@@ -69,39 +73,36 @@ func (b *Bus) Receive(event EventContract) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
-	if event == nil {
+	if b.handlers == nil || event == nil {
 		return nil
-	}
-	if b.handlers == nil {
-		b.handlers = make(map[EventType][]func(event EventContract) error)
 	}
 
 	// Ensure we don't get a collision if two or more goroutines try to read concurrently
 	b.handlersMu.Lock()
 	defer b.handlersMu.Unlock()
 
-	// TODO: use goroutines to make this concurrent
-
-	// Invoke handlers registered for the specific event type first.
+	// Set up a consistent way to process our event handlers.
 	processingErrChan := make(chan error)
-	if handlers, exists := b.handlers[event.Type()]; exists {
+	processHandlersFunc := func(handlers []func(event EventContract) error) {
 		for _, handler := range handlers {
 			if handler != nil {
-				if err := handler(event); err != nil {
-					processingErrChan <- err
-				}
+				// Process each event handler in its own goroutine to avoid creating a blocking queue.
+				go func(handlerFunc func(event EventContract) error) {
+					if err := handlerFunc(event); err != nil {
+						processingErrChan <- err
+					}
+				}(handler)
 			}
 		}
 	}
+
+	// Invoke handlers registered for the specific event type first.
+	if handlers, exists := b.handlers[event.Type()]; exists {
+		processHandlersFunc(handlers)
+	}
 	// Invoke any handlers registered for "all" event types second.
 	if handlers, exists := b.handlers[EventTypeAll]; exists {
-		for _, handler := range handlers {
-			if handler != nil {
-				if err := handler(event); err != nil {
-					processingErrChan <- err
-				}
-			}
-		}
+		processHandlersFunc(handlers)
 	}
 
 	// Return all errors (if any) encountered during event processing.
@@ -115,6 +116,16 @@ func (b *Bus) Receive(event EventContract) error {
 		}
 	}
 	return fullErr
+}
+
+// RegisterDefaultHandler registers a default handler function for ALL event types.
+func (b *Bus) RegisterDefaultHandler() error {
+	return b.RegisterHandler(EventTypeAll, func(event EventContract) error {
+		if event == nil {
+			return nil
+		}
+		return event.Process()
+	})
 }
 
 // RegisterHandler registers a handler function for a specific event type.
