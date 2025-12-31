@@ -1,5 +1,16 @@
 package event
 
+import "context"
+
+// BusPumperContract defines the interface for pumping events from a bus.
+//
+// Implementing this interface is NOT a requirement for having an event bus, but it provides a generic way to
+// encapsulate any event pumping functionality.
+type BusPumperContract interface {
+	// PumpEvents pumps events from the bus for processing.
+	PumpEvents(ctx context.Context) error
+}
+
 // BusPublisherContract defines the interface for publishing events to a bus.
 type BusPublisherContract interface {
 	// Publish publishes an event to the bus.

@@ -128,9 +128,9 @@ func connectToDatabaseFromConfig(
 	return database.NewPostgresDatabaseConnection(connectionArguments, isDebugModeActive)
 }
 
-// runEventBus runs the event bus processor.
-func runEventBus(ctx context.Context, eventBus *event.Bus, debugLogger servicelogger.DebugContract) {
-	go func(ctx context.Context, bus *event.Bus, logger servicelogger.DebugContract) {
+// pumpEventBus pumps events from the provided event bus in its own goroutine.
+func pumpEventBus(ctx context.Context, eventBus event.BusPumperContract, debugLogger servicelogger.DebugContract) {
+	go func(ctx context.Context, bus event.BusPumperContract, logger servicelogger.DebugContract) {
 		logger.Debug("Starting event bus pump...")
 		if bus == nil {
 			logger.Debug("No event bus instance provided; skipping event bus pump.")
@@ -195,7 +195,7 @@ func main() {
 	cancelCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	eventBus := event.NewBus()
-	runEventBus(cancelCtx, eventBus, logger)
+	pumpEventBus(cancelCtx, eventBus, logger)
 
 	// Resolve the necessary ports
 	grpcPort, exists := envConfig.GetProperty(config.PropertyNameGRPCPort)
