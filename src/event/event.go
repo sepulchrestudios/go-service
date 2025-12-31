@@ -25,8 +25,24 @@ type BusContract interface {
 // The intent is for an event to be self-contained and capable of executing its own processing logic.
 type EventContract interface {
 	// Process invokes the functionality to process the event.
-	Process() error
+	Process() EventResultContract
 
 	// Type returns the type or category of the event.
 	Type() EventType
+}
+
+// EventResultContract defines the interface for the result of processing an event.
+type EventResultContract interface {
+	// Error retrieves the error message encountered during event processing. This also allows the implementation to be
+	// used as an error type.
+	Error() string
+
+	// ErrorInstance retrieves any error encountered during event processing.
+	ErrorInstance() error
+
+	// Return retrieves any relevant data returned from processing the event.
+	Return() any
+
+	// Success indicates whether the event was processed successfully.
+	Success() bool
 }

@@ -2,12 +2,11 @@ package event
 
 import (
 	"context"
-	"fmt"
 	"sync"
 )
 
 // HandlerFunc defines the function signature for event handler functions.
-type HandlerFunc func(event EventContract) error
+type HandlerFunc func(event EventContract) EventResultContract
 
 // Bus is a simple in-memory implementation of an event bus. It also contains a mutex so it should ONLY be
 // passed around by-reference and never by-value.
@@ -15,15 +14,7 @@ type Bus struct {
 	handlers   map[EventType][]HandlerFunc
 	handlersMu sync.Mutex
 	pipeline   chan EventContract
-	errorChan  chan error
-}
-
-// Errors returns a channel that emits errors encountered during event processing.
-func (b *Bus) Errors() chan error {
-	if b == nil {
-		return nil
-	}
-	return b.errorChan
+	resultChan chan EventResultContract
 }
 
 // Publish publishes an event to the bus.
@@ -56,14 +47,15 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case event := <-b.pipeline:
-			if b.errorChan == nil {
-				b.errorChan = make(chan error)
+			if b.resultChan == nil {
+				b.resultChan = make(chan EventResultContract)
 			}
 			if event != nil {
 				// Process each event in its own goroutine to avoid creating a blocking queue.
 				go func(e EventContract) {
-					if err := b.Receive(e); err != nil {
-						b.errorChan <- err
+					results := b.Receive(e)
+					for _, result := range results {
+						b.resultChan <- result
 					}
 				}(event)
 			}
@@ -72,12 +64,9 @@ func (b *Bus) PumpEvents(ctx context.Context) error {
 }
 
 // Receive receives an event from the bus and processes it.
-func (b *Bus) Receive(event EventContract) error {
-	if b == nil {
-		return ErrBusCannotBeNil
-	}
-	if b.handlers == nil || event == nil {
-		return nil
+func (b *Bus) Receive(event EventContract) []EventResultContract {
+	if b == nil || b.handlers == nil || event == nil {
+		return []EventResultContract{}
 	}
 
 	// Ensure we don't get a collision if two or more goroutines try to read concurrently
@@ -85,14 +74,15 @@ func (b *Bus) Receive(event EventContract) error {
 	defer b.handlersMu.Unlock()
 
 	// Set up a consistent way to process our event handlers.
-	processingErrChan := make(chan error)
+	processingResultChan := make(chan EventResultContract)
 	processHandlersFunc := func(handlers []HandlerFunc) {
 		for _, handler := range handlers {
 			if handler != nil {
 				// Process each event handler in its own goroutine to avoid creating a blocking queue.
 				go func(handlerFunc HandlerFunc) {
-					if err := handlerFunc(event); err != nil {
-						processingErrChan <- err
+					result := handlerFunc(event)
+					if result != nil {
+						processingResultChan <- result
 					}
 				}(handler)
 			}
@@ -109,21 +99,17 @@ func (b *Bus) Receive(event EventContract) error {
 	}
 
 	// Return all errors (if any) encountered during event processing.
-	close(processingErrChan)
-	var fullErr error
-	for err := range processingErrChan {
-		if fullErr == nil {
-			fullErr = err
-		} else {
-			fullErr = fmt.Errorf("%w: %w", fullErr, err)
-		}
+	close(processingResultChan)
+	results := []EventResultContract{}
+	for result := range processingResultChan {
+		results = append(results, result)
 	}
-	return fullErr
+	return results
 }
 
 // RegisterDefaultHandler registers a default handler function for ALL event types.
 func (b *Bus) RegisterDefaultHandler() error {
-	return b.RegisterHandler(EventTypeAll, func(event EventContract) error {
+	return b.RegisterHandler(EventTypeAll, func(event EventContract) EventResultContract {
 		if event == nil {
 			return nil
 		}
@@ -149,11 +135,19 @@ func (b *Bus) RegisterHandler(eventType EventType, handler HandlerFunc) error {
 	return nil
 }
 
+// Results returns a channel that emits results from event processing.
+func (b *Bus) Results() chan EventResultContract {
+	if b == nil {
+		return nil
+	}
+	return b.resultChan
+}
+
 // NewBus creates a new event bus instance.
 func NewBus() *Bus {
 	return &Bus{
-		handlers:  make(map[EventType][]HandlerFunc),
-		pipeline:  make(chan EventContract),
-		errorChan: make(chan error),
+		handlers:   make(map[EventType][]HandlerFunc),
+		pipeline:   make(chan EventContract),
+		resultChan: make(chan EventResultContract),
 	}
 }
