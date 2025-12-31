@@ -31,18 +31,31 @@ type EventContract interface {
 	Type() EventType
 }
 
-// EventResultContract defines the interface for the result of processing an event.
-type EventResultContract interface {
+// EventResultErrorContract defines the interface for retrieving error information from an event result.
+type EventResultErrorContract interface {
 	// Error retrieves the error message encountered during event processing. This also allows the implementation to be
 	// used as an error type.
 	Error() string
 
 	// ErrorInstance retrieves any error encountered during event processing.
 	ErrorInstance() error
+}
 
+// EventResultReturnContract defines the interface for retrieving return data from an event result.
+type EventResultReturnContract interface {
 	// Return retrieves any relevant data returned from processing the event.
 	Return() any
+}
 
+// EventResultSuccessContract defines the interface for retrieving success status from an event result.
+type EventResultSuccessContract interface {
 	// Success indicates whether the event was processed successfully.
 	Success() bool
+}
+
+// EventResultContract defines the interface for the result of processing an event.
+type EventResultContract interface {
+	EventResultErrorContract
+	EventResultReturnContract
+	EventResultSuccessContract
 }

@@ -8,7 +8,7 @@ import (
 // HandlerFunc defines the function signature for event handler functions.
 type HandlerFunc func(event EventContract) EventResultContract
 
-// Bus is a simple in-memory implementation of an event bus. It also contains a mutex so it should ONLY be
+// Bus is a simple concurrent in-memory implementation of an event bus. It also contains a mutex so it should ONLY be
 // passed around by-reference and never by-value.
 type Bus struct {
 	handlers   map[EventType][]HandlerFunc
