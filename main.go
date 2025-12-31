@@ -13,9 +13,11 @@ import (
 	"github.com/sepulchrestudios/go-service/src/cache"
 	"github.com/sepulchrestudios/go-service/src/config"
 	"github.com/sepulchrestudios/go-service/src/database"
+	"github.com/sepulchrestudios/go-service/src/event"
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
 	"github.com/sepulchrestudios/go-service/src/server"
 	"github.com/sepulchrestudios/go-service/src/service"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -126,6 +128,19 @@ func connectToDatabaseFromConfig(
 	return database.NewPostgresDatabaseConnection(connectionArguments, isDebugModeActive)
 }
 
+// runEventBus runs the event bus processor.
+func runEventBus(ctx context.Context, eventBus *event.Bus, debugLogger servicelogger.DebugContract) {
+	go func(ctx context.Context, bus *event.Bus, logger servicelogger.DebugContract) {
+		logger.Debug("Starting event bus pump...")
+		if bus == nil {
+			logger.Debug("No event bus instance provided; skipping event bus pump.")
+			return
+		}
+		err := bus.PumpEvents(ctx)
+		logger.Debug("Finished pumping events.", zap.Error(err))
+	}(ctx, eventBus, debugLogger)
+}
+
 func main() {
 	// Much of this comes from the barebones gRPC Gateway functionality:
 	// https://grpc-ecosystem.github.io/grpc-gateway/docs/tutorials/adding_annotations/#using-protoc
@@ -175,6 +190,12 @@ func main() {
 		logger.Fatal(fmt.Sprintf("Cannot connect to cache: %v", err))
 	}
 	logger.Info("Connected to cache successfully")
+
+	// Start the event bus processor
+	cancelCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	eventBus := event.NewBus()
+	runEventBus(cancelCtx, eventBus, logger)
 
 	// Resolve the necessary ports
 	grpcPort, exists := envConfig.GetProperty(config.PropertyNameGRPCPort)
