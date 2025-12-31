@@ -6,10 +6,13 @@ import (
 	"sync"
 )
 
+// HandlerFunc defines the function signature for event handler functions.
+type HandlerFunc func(event EventContract) error
+
 // Bus is a simple in-memory implementation of an event bus. It also contains a mutex so it should ONLY be
 // passed around by-reference and never by-value.
 type Bus struct {
-	handlers   map[EventType][]func(event EventContract) error
+	handlers   map[EventType][]HandlerFunc
 	handlersMu sync.Mutex
 	pipeline   chan EventContract
 	errorChan  chan error
@@ -83,11 +86,11 @@ func (b *Bus) Receive(event EventContract) error {
 
 	// Set up a consistent way to process our event handlers.
 	processingErrChan := make(chan error)
-	processHandlersFunc := func(handlers []func(event EventContract) error) {
+	processHandlersFunc := func(handlers []HandlerFunc) {
 		for _, handler := range handlers {
 			if handler != nil {
 				// Process each event handler in its own goroutine to avoid creating a blocking queue.
-				go func(handlerFunc func(event EventContract) error) {
+				go func(handlerFunc HandlerFunc) {
 					if err := handlerFunc(event); err != nil {
 						processingErrChan <- err
 					}
@@ -129,7 +132,7 @@ func (b *Bus) RegisterDefaultHandler() error {
 }
 
 // RegisterHandler registers a handler function for a specific event type.
-func (b *Bus) RegisterHandler(eventType EventType, handler func(event EventContract) error) error {
+func (b *Bus) RegisterHandler(eventType EventType, handler HandlerFunc) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
@@ -137,10 +140,10 @@ func (b *Bus) RegisterHandler(eventType EventType, handler func(event EventContr
 		return ErrCannotRegisterEventHandlerNil
 	}
 	if b.handlers == nil {
-		b.handlers = make(map[EventType][]func(event EventContract) error)
+		b.handlers = make(map[EventType][]HandlerFunc)
 	}
 	if _, exists := b.handlers[eventType]; !exists {
-		b.handlers[eventType] = []func(event EventContract) error{}
+		b.handlers[eventType] = []HandlerFunc{}
 	}
 	b.handlers[eventType] = append(b.handlers[eventType], handler)
 	return nil
@@ -149,7 +152,7 @@ func (b *Bus) RegisterHandler(eventType EventType, handler func(event EventContr
 // NewBus creates a new event bus instance.
 func NewBus() *Bus {
 	return &Bus{
-		handlers:  make(map[EventType][]func(event EventContract) error),
+		handlers:  make(map[EventType][]HandlerFunc),
 		pipeline:  make(chan EventContract),
 		errorChan: make(chan error),
 	}
