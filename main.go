@@ -188,10 +188,14 @@ func main() {
 	}
 	logger.Info("Connected to cache successfully")
 
-	// Start the event bus processor
+	// Start the event bus processor with a single registered default handler
 	cancelCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	eventBus := event.NewBus()
+	err = eventBus.RegisterDefaultHandler()
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot register default event handler: %v", err))
+	}
 	pumpEventBus(cancelCtx, eventBus, logger)
 
 	// Resolve the necessary ports
