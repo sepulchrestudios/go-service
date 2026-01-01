@@ -142,9 +142,6 @@ func pumpEventBus(ctx context.Context, eventBus event.BusPumperContract, debugLo
 }
 
 func main() {
-	// Much of this comes from the barebones gRPC Gateway functionality:
-	// https://grpc-ecosystem.github.io/grpc-gateway/docs/tutorials/adding_annotations/#using-protoc
-
 	var envConfig config.Contract
 	var err error
 
@@ -206,6 +203,9 @@ func main() {
 	if !exists {
 		logger.Fatal(fmt.Sprintf("Cannot read property from configuration: %s", config.PropertyNameHTTPPort))
 	}
+
+	// Much of this HTTP/gRPC stuff comes from the barebones gRPC Gateway functionality:
+	// https://grpc-ecosystem.github.io/grpc-gateway/docs/tutorials/adding_annotations/#using-protoc
 
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
