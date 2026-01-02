@@ -58,6 +58,12 @@ type EventResultReturnContract interface {
 	Return() any
 }
 
+// EventResultSourceContract defines the interface for retrieving the source event from an event result.
+type EventResultSourceContract interface {
+	// Event returns the source event associated with this result.
+	Event() EventContract
+}
+
 // EventResultSuccessContract defines the interface for retrieving success status from an event result.
 type EventResultSuccessContract interface {
 	// Success indicates whether the event was processed successfully.
@@ -68,8 +74,6 @@ type EventResultSuccessContract interface {
 type EventResultContract interface {
 	EventResultErrorContract
 	EventResultReturnContract
+	EventResultSourceContract
 	EventResultSuccessContract
-
-	// Event returns the event associated with this result.
-	Event() EventContract
 }
