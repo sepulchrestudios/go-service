@@ -61,6 +61,27 @@ const (
 	// PropertyNameLoadEnvFromFile represents whether to load environment variables from a .env file.
 	PropertyNameLoadEnvFromFile PropertyName = "LOAD_ENV_FROM_FILE"
 
+	// PropertyNameMailHost represents the mail server host address.
+	PropertyNameMailHost PropertyName = "MAIL_HOST"
+
+	// PropertyNameMailPassword represents the mail server password.
+	PropertyNameMailPassword PropertyName = "MAIL_PASSWORD"
+
+	// PropertyNameMailPasswordFile represents the file path from which to read the mail server password.
+	PropertyNameMailPasswordFile PropertyName = "MAIL_PASSWORD_FILE"
+
+	// PropertyNameMailPort represents the mail server port.
+	PropertyNameMailPort PropertyName = "MAIL_PORT"
+
+	// PropertyNameMailSenderAddress represents the mail sender's email address.
+	PropertyNameMailSenderAddress PropertyName = "MAIL_SENDER_ADDRESS"
+
+	// PropertyNameMailSenderName represents the mail sender's human-readable name.
+	PropertyNameMailSenderName PropertyName = "MAIL_SENDER_NAME"
+
+	// PropertyNameMailUsername represents the mail server username.
+	PropertyNameMailUsername PropertyName = "MAIL_USERNAME"
+
 	// PropertyNameServiceName represents the human-readable name of the service that is running.
 	PropertyNameServiceName PropertyName = "NAME"
 )
@@ -87,6 +108,13 @@ func GetAvailableConfigurationKeys() []PropertyName {
 		PropertyNameGRPCPort,
 		PropertyNameHTTPPort,
 		PropertyNameLoadEnvFromFile,
+		PropertyNameMailHost,
+		PropertyNameMailPassword,
+		PropertyNameMailPasswordFile,
+		PropertyNameMailPort,
+		PropertyNameMailSenderAddress,
+		PropertyNameMailSenderName,
+		PropertyNameMailUsername,
 		PropertyNameServiceName,
 	}
 }
