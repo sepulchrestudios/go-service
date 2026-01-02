@@ -2,17 +2,17 @@ package event
 
 // Result represents the outcome of processing an event.
 type Result struct {
-	// event is the event associated with this result.
-	event EventContract
-
-	// success indicates whether the event was processed successfully.
-	success bool
+	// err is an error (if any) encountered during event processing.
+	err error
 
 	// returnData holds any relevant data returned from processing the event.
 	returnData any
 
-	// err is an error (if any) encountered during event processing.
-	err error
+	// source is the source event associated with this result.
+	source EventContract
+
+	// success indicates whether the event was processed successfully.
+	success bool
 }
 
 // Error retrieves the error message encountered during event processing. This also allows the Result struct to be
@@ -32,20 +32,20 @@ func (r *Result) ErrorInstance() error {
 	return r.err
 }
 
-// Event returns the event associated with this result.
-func (r *Result) Event() EventContract {
-	if r == nil {
-		return nil
-	}
-	return r.event
-}
-
 // Return retrieves any relevant data returned from processing the event.
 func (r *Result) Return() any {
 	if r == nil {
 		return nil
 	}
 	return r.returnData
+}
+
+// Source returns the source event associated with this result.
+func (r *Result) Source() EventContract {
+	if r == nil {
+		return nil
+	}
+	return r.source
 }
 
 // Success indicates whether the event was processed successfully.
@@ -62,11 +62,11 @@ func NewEmptyResult() *Result {
 }
 
 // NewResult creates a new Result instance.
-func NewResult(success bool, returnData any, err error, event EventContract) *Result {
+func NewResult(success bool, returnData any, err error, source EventContract) *Result {
 	return &Result{
-		success:    success,
-		returnData: returnData,
 		err:        err,
-		event:      event,
+		returnData: returnData,
+		source:     source,
+		success:    success,
 	}
 }
