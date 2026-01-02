@@ -1,6 +1,10 @@
 # Sepulchre Studios - Go Service
 
-The core layer that is intended to serve as a module dependency for our dedicated services, written in Go.
+## About
+
+Developed by [@matthewfritz](https://github.com/matthewfritz).
+
+This is the core layer that is intended to serve as a module dependency for our dedicated services, written in Go.
 
 An example `main.go` file is provided to show a "liveness" server running and give you an idea of how to implement your own service startup sequence.
 
