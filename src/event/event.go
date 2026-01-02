@@ -69,4 +69,7 @@ type EventResultContract interface {
 	EventResultErrorContract
 	EventResultReturnContract
 	EventResultSuccessContract
+
+	// Event returns the event associated with this result.
+	Event() EventContract
 }
