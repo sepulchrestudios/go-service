@@ -31,6 +31,12 @@ type BusContract interface {
 	BusSubscriberContract
 }
 
+// PumpingBusContract defines the interface for a work bus that can publish, subscribe to, and pump work items.
+type PumpingBusContract interface {
+	BusContract
+	BusPumperContract
+}
+
 // WorkContract defines the interface for a general work item that can be processed.
 //
 // The intent is for a work item to be self-contained and capable of executing its own processing logic.
