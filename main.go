@@ -15,6 +15,7 @@ import (
 	"github.com/sepulchrestudios/go-service/src/database"
 	"github.com/sepulchrestudios/go-service/src/event"
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
+	"github.com/sepulchrestudios/go-service/src/mail"
 	"github.com/sepulchrestudios/go-service/src/server"
 	"github.com/sepulchrestudios/go-service/src/service"
 	"github.com/sepulchrestudios/go-service/src/work"
@@ -142,6 +143,19 @@ func pumpEventBus(ctx context.Context, eventBus work.BusPumperContract, debugLog
 	}(ctx, eventBus, debugLogger)
 }
 
+// pumpMailBus pumps events from the provided mail bus in its own goroutine.
+func pumpMailBus(ctx context.Context, mailBus work.BusPumperContract, debugLogger servicelogger.DebugContract) {
+	go func(ctx context.Context, bus work.BusPumperContract, logger servicelogger.DebugContract) {
+		logger.Debug("Starting mail bus pump...")
+		if bus == nil {
+			logger.Debug("No mail bus instance provided; skipping mail bus pump.")
+			return
+		}
+		err := bus.Pump(ctx)
+		logger.Debug("Finished pumping mail messages.", zap.Error(err))
+	}(ctx, mailBus, debugLogger)
+}
+
 func main() {
 	var envConfig config.Contract
 	var err error
@@ -189,15 +203,25 @@ func main() {
 	}
 	logger.Info("Connected to cache successfully")
 
-	// Start the event bus processor with a single registered default handler
+	// Create a cancellable context for the event and mail bus processors
 	cancelCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	// Start the event bus processor with a single registered default handler
 	eventBus := event.NewBus(work.NewBus())
 	err = eventBus.RegisterDefaultHandler()
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Cannot register default event handler: %v", err))
 	}
 	pumpEventBus(cancelCtx, eventBus, logger)
+
+	// Start the mail bus processor with a single registered default handler
+	mailBus := mail.NewBus(work.NewBus())
+	err = mailBus.RegisterDefaultHandler()
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot register default message handler: %v", err))
+	}
+	pumpMailBus(cancelCtx, mailBus, logger)
 
 	// Resolve the necessary ports
 	grpcPort, exists := envConfig.GetProperty(config.PropertyNameGRPCPort)
