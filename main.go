@@ -17,6 +17,7 @@ import (
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
 	"github.com/sepulchrestudios/go-service/src/server"
 	"github.com/sepulchrestudios/go-service/src/service"
+	"github.com/sepulchrestudios/go-service/src/work"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -129,14 +130,14 @@ func connectToDatabaseFromConfig(
 }
 
 // pumpEventBus pumps events from the provided event bus in its own goroutine.
-func pumpEventBus(ctx context.Context, eventBus event.BusPumperContract, debugLogger servicelogger.DebugContract) {
-	go func(ctx context.Context, bus event.BusPumperContract, logger servicelogger.DebugContract) {
+func pumpEventBus(ctx context.Context, eventBus work.BusPumperContract, debugLogger servicelogger.DebugContract) {
+	go func(ctx context.Context, bus work.BusPumperContract, logger servicelogger.DebugContract) {
 		logger.Debug("Starting event bus pump...")
 		if bus == nil {
 			logger.Debug("No event bus instance provided; skipping event bus pump.")
 			return
 		}
-		err := bus.PumpEvents(ctx)
+		err := bus.Pump(ctx)
 		logger.Debug("Finished pumping events.", zap.Error(err))
 	}(ctx, eventBus, debugLogger)
 }
@@ -191,7 +192,7 @@ func main() {
 	// Start the event bus processor with a single registered default handler
 	cancelCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	eventBus := event.NewBus()
+	eventBus := event.NewBus(work.NewBus())
 	err = eventBus.RegisterDefaultHandler()
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Cannot register default event handler: %v", err))

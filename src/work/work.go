@@ -22,7 +22,7 @@ type BusSubscriberContract interface {
 	// Subscribe receives a work item from the bus.
 	//
 	// This is generally where the work-specific handlers would be invoked.
-	Subscribe(workItem WorkContract) error
+	Subscribe(workItem WorkContract) []WorkResultContract
 }
 
 // BusWorkHandlerContract defines the interface for registering work handlers on a bus.

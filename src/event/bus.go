@@ -2,116 +2,56 @@ package event
 
 import (
 	"context"
-	"sync"
+
+	"github.com/sepulchrestudios/go-service/src/work"
 )
 
-// HandlerFunc defines the function signature for event handler functions.
-type HandlerFunc func(event EventContract) EventResultContract
-
-// Bus is a simple concurrent in-memory implementation of an event bus. It also contains a mutex so it should ONLY be
-// passed around by-reference and never by-value.
+// Bus is a simple concurrent in-memory implementation of an event bus.
 //
 // Under the hood, it essentially implements the Publisher-Subscriber and Observer design patterns.
 type Bus struct {
-	handlers   map[EventType][]HandlerFunc
-	handlersMu sync.Mutex
-	pipeline   chan EventContract
-	resultChan chan EventResultContract
+	workBus work.PumpingWorkHandlerBusContract
 }
 
 // Publish publishes an event to the bus.
-func (b *Bus) Publish(event EventContract) error {
+func (b *Bus) Publish(event work.WorkContract) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
-	if b.pipeline == nil {
-		return ErrCannotPublishEvent
+	if b.workBus == nil {
+		return ErrWorkBusCannotBeNil
 	}
 	if event == nil {
 		return nil
 	}
-	b.pipeline <- event
-	return nil
+	return b.workBus.Publish(event)
 }
 
-// PumpEvents continuously pumps events from the internal pipeline for processing until the provided context is done.
-//
-// This method BLOCKS until ctx.Done() is closed, so it should be run in its own goroutine.
-func (b *Bus) PumpEvents(ctx context.Context) error {
+// Pump continuously pumps events from the internal pipeline for processing.
+func (b *Bus) Pump(ctx context.Context) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
-	if b.pipeline == nil {
-		return ErrCannotPumpEvents
+	if b.workBus == nil {
+		return ErrWorkBusCannotBeNil
 	}
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case event := <-b.pipeline:
-			if b.resultChan == nil {
-				b.resultChan = make(chan EventResultContract)
-			}
-			if event != nil {
-				// Process each event in its own goroutine to avoid creating a blocking queue.
-				go func(e EventContract) {
-					results := b.Subscribe(e)
-					for _, result := range results {
-						b.resultChan <- result
-					}
-				}(event)
-			}
-		}
-	}
+	return b.workBus.Pump(ctx)
 }
 
 // Subscribe receives an event from the bus and processes it.
-func (b *Bus) Subscribe(event EventContract) []EventResultContract {
-	if b == nil || b.handlers == nil || event == nil {
-		return []EventResultContract{}
+func (b *Bus) Subscribe(event work.WorkContract) []work.WorkResultContract {
+	if b == nil || b.workBus == nil || event == nil {
+		return []work.WorkResultContract{}
 	}
-
-	// Ensure we don't get a collision if two or more goroutines try to read concurrently
-	b.handlersMu.Lock()
-	defer b.handlersMu.Unlock()
-
-	// Set up a consistent way to process our event handlers.
-	processingResultChan := make(chan EventResultContract)
-	processHandlersFunc := func(handlers []HandlerFunc) {
-		for _, handler := range handlers {
-			if handler != nil {
-				// Process each event handler in its own goroutine to avoid creating a blocking queue.
-				go func(handlerFunc HandlerFunc) {
-					result := handlerFunc(event)
-					if result != nil {
-						processingResultChan <- result
-					}
-				}(handler)
-			}
-		}
-	}
-
-	// Invoke handlers registered for the specific event type first.
-	if handlers, exists := b.handlers[event.Type()]; exists {
-		processHandlersFunc(handlers)
-	}
-	// Invoke any handlers registered for "all" event types second.
-	if handlers, exists := b.handlers[EventTypeAll]; exists {
-		processHandlersFunc(handlers)
-	}
-
-	// Return all errors (if any) encountered during event processing.
-	close(processingResultChan)
-	results := []EventResultContract{}
-	for result := range processingResultChan {
-		results = append(results, result)
-	}
-	return results
+	return b.workBus.Subscribe(event)
 }
 
 // RegisterDefaultHandler registers a default handler function for ALL event types.
 func (b *Bus) RegisterDefaultHandler() error {
-	return b.RegisterHandler(EventTypeAll, func(event EventContract) EventResultContract {
+	if b == nil {
+		return ErrBusCannotBeNil
+	}
+	return b.RegisterEventHandler(EventTypeAll, func(event work.WorkContract) work.WorkResultContract {
 		if event == nil {
 			return nil
 		}
@@ -119,37 +59,42 @@ func (b *Bus) RegisterDefaultHandler() error {
 	})
 }
 
-// RegisterHandler registers a handler function for a specific event type.
-func (b *Bus) RegisterHandler(eventType EventType, handler HandlerFunc) error {
+// RegisterEventHandler registers a handler function for a specific event type.
+func (b *Bus) RegisterEventHandler(eventType EventType, handler work.HandlerFunc) error {
 	if b == nil {
 		return ErrBusCannotBeNil
+	}
+	return b.RegisterHandler(work.WorkType(eventType), handler)
+}
+
+// RegisterHandler registers a handler function for a specific work type.
+func (b *Bus) RegisterHandler(eventType work.WorkType, handler work.HandlerFunc) error {
+	if b == nil {
+		return ErrBusCannotBeNil
+	}
+	if b.workBus == nil {
+		return ErrWorkBusCannotBeNil
 	}
 	if handler == nil {
 		return ErrCannotRegisterEventHandlerNil
 	}
-	if b.handlers == nil {
-		b.handlers = make(map[EventType][]HandlerFunc)
-	}
-	if _, exists := b.handlers[eventType]; !exists {
-		b.handlers[eventType] = []HandlerFunc{}
-	}
-	b.handlers[eventType] = append(b.handlers[eventType], handler)
-	return nil
+	return b.workBus.RegisterHandler(eventType, handler)
 }
 
 // Results returns a channel that emits results from event processing.
-func (b *Bus) Results() chan EventResultContract {
+func (b *Bus) Results() chan work.WorkResultContract {
 	if b == nil {
 		return nil
 	}
-	return b.resultChan
+	if b.workBus == nil {
+		return nil
+	}
+	return b.workBus.Results()
 }
 
 // NewBus creates a new event bus instance.
-func NewBus() *Bus {
+func NewBus(workBus work.PumpingWorkHandlerBusContract) *Bus {
 	return &Bus{
-		handlers:   make(map[EventType][]HandlerFunc),
-		pipeline:   make(chan EventContract),
-		resultChan: make(chan EventResultContract),
+		workBus: workBus,
 	}
 }
