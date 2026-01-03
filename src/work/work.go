@@ -25,6 +25,18 @@ type BusSubscriberContract interface {
 	Subscribe(workItem WorkContract) error
 }
 
+// BusWorkHandlerContract defines the interface for registering work handlers on a bus.
+type BusWorkHandlerContract interface {
+	// RegisterHandler registers a handler function for a specific work type.
+	RegisterHandler(workType WorkType, handler HandlerFunc) error
+}
+
+// BusWorkHandlerResultsContract defines the interface for retrieving work results from a bus.
+type BusWorkHandlerResultsContract interface {
+	// Results returns a channel that emits results from work processing.
+	Results() chan WorkResultContract
+}
+
 // BusContract defines the interface for a work bus that can publish and subscribe to work items.
 type BusContract interface {
 	BusPublisherContract
@@ -35,6 +47,14 @@ type BusContract interface {
 type PumpingBusContract interface {
 	BusContract
 	BusPumperContract
+}
+
+// PumpingWorkHandlerBusContract defines the interface for a pumping work bus that can register handlers and retrieve
+// results from processing work items.
+type PumpingWorkHandlerBusContract interface {
+	PumpingBusContract
+	BusWorkHandlerContract
+	BusWorkHandlerResultsContract
 }
 
 // WorkContract defines the interface for a general work item that can be processed.

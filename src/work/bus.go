@@ -5,9 +5,6 @@ import (
 	"sync"
 )
 
-// HandlerFunc defines the function signature for work item handler functions.
-type HandlerFunc func(workItem WorkContract) WorkResultContract
-
 // Bus is a simple concurrent in-memory implementation of a work bus. It also contains a mutex so it should ONLY be
 // passed around by-reference and never by-value.
 //
@@ -107,16 +104,6 @@ func (b *Bus) Subscribe(workItem WorkContract) []WorkResultContract {
 		results = append(results, result)
 	}
 	return results
-}
-
-// RegisterDefaultHandler registers a default handler function for ALL work types.
-func (b *Bus) RegisterDefaultHandler() error {
-	return b.RegisterHandler(WorkTypeAll, func(workItem WorkContract) WorkResultContract {
-		if workItem == nil {
-			return nil
-		}
-		return workItem.Process()
-	})
 }
 
 // RegisterHandler registers a handler function for a specific work type.
