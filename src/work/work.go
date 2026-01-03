@@ -57,6 +57,14 @@ type PumpingWorkHandlerBusContract interface {
 	BusWorkHandlerResultsContract
 }
 
+// WorkHandlerBusContract defines the interface for a work bus that can register handlers and retrieve results from
+// processing work items.
+type WorkHandlerBusContract interface {
+	BusContract
+	BusWorkHandlerContract
+	BusWorkHandlerResultsContract
+}
+
 // WorkContract defines the interface for a general work item that can be processed.
 //
 // The intent is for a work item to be self-contained and capable of executing its own processing logic.
