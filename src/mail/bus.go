@@ -6,7 +6,7 @@ import (
 	"github.com/sepulchrestudios/go-service/src/work"
 )
 
-// Bus is a simple concurrent in-memory implementation of a mail bus.
+// Bus is a simple in-memory implementation of a mail bus.
 //
 // Under the hood, it essentially implements the Publisher-Subscriber and Observer design patterns.
 type Bus struct {

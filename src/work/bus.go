@@ -132,7 +132,7 @@ func (b *Bus) Results() chan WorkResultContract {
 	return b.resultChan
 }
 
-// NewBus creates a new work bus instance.
+// NewBus creates a new concurrent work bus instance.
 func NewBus() *Bus {
 	return &Bus{
 		handlers:   make(map[WorkType][]HandlerFunc),
