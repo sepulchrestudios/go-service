@@ -5,11 +5,11 @@ import (
 	"sync"
 )
 
-// Bus is a simple concurrent in-memory implementation of a work bus. It also contains a mutex so it should ONLY be
-// passed around by-reference and never by-value.
+// ConcurrentBus is a simple concurrent in-memory implementation of a work bus. It also contains a mutex so it should
+// ONLY be passed around by-reference and never by-value.
 //
 // Under the hood, it essentially implements the Publisher-Subscriber and Observer design patterns.
-type Bus struct {
+type ConcurrentBus struct {
 	handlers   map[WorkType][]HandlerFunc
 	handlersMu sync.Mutex
 	pipeline   chan WorkContract
@@ -17,7 +17,7 @@ type Bus struct {
 }
 
 // Publish publishes a work item to the bus.
-func (b *Bus) Publish(workItem WorkContract) error {
+func (b *ConcurrentBus) Publish(workItem WorkContract) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
@@ -34,7 +34,7 @@ func (b *Bus) Publish(workItem WorkContract) error {
 // Pump continuously pumps work from the internal pipeline for processing until the provided context is done.
 //
 // This method BLOCKS until ctx.Done() is closed, so it should be run in its own goroutine.
-func (b *Bus) Pump(ctx context.Context) error {
+func (b *ConcurrentBus) Pump(ctx context.Context) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
@@ -63,7 +63,7 @@ func (b *Bus) Pump(ctx context.Context) error {
 }
 
 // Subscribe receives a work item from the bus and processes it.
-func (b *Bus) Subscribe(workItem WorkContract) []WorkResultContract {
+func (b *ConcurrentBus) Subscribe(workItem WorkContract) []WorkResultContract {
 	if b == nil || b.handlers == nil || workItem == nil {
 		return []WorkResultContract{}
 	}
@@ -107,7 +107,7 @@ func (b *Bus) Subscribe(workItem WorkContract) []WorkResultContract {
 }
 
 // RegisterHandler registers a handler function for a specific work type.
-func (b *Bus) RegisterHandler(workType WorkType, handler HandlerFunc) error {
+func (b *ConcurrentBus) RegisterHandler(workType WorkType, handler HandlerFunc) error {
 	if b == nil {
 		return ErrBusCannotBeNil
 	}
@@ -125,16 +125,16 @@ func (b *Bus) RegisterHandler(workType WorkType, handler HandlerFunc) error {
 }
 
 // Results returns a channel that emits results from work processing.
-func (b *Bus) Results() chan WorkResultContract {
+func (b *ConcurrentBus) Results() chan WorkResultContract {
 	if b == nil {
 		return nil
 	}
 	return b.resultChan
 }
 
-// NewBus creates a new concurrent work bus instance.
-func NewBus() *Bus {
-	return &Bus{
+// NewConcurrentBus creates a new concurrent work bus instance.
+func NewConcurrentBus() *ConcurrentBus {
+	return &ConcurrentBus{
 		handlers:   make(map[WorkType][]HandlerFunc),
 		pipeline:   make(chan WorkContract),
 		resultChan: make(chan WorkResultContract),

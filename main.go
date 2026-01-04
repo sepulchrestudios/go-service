@@ -208,7 +208,7 @@ func main() {
 	defer cancel()
 
 	// Start the event bus processor with a single registered default handler
-	eventBus := event.NewBus(work.NewBus())
+	eventBus := event.NewBus(work.NewConcurrentBus())
 	err = eventBus.RegisterDefaultHandler()
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Cannot register default event handler: %v", err))
@@ -216,7 +216,7 @@ func main() {
 	pumpEventBus(cancelCtx, eventBus, logger)
 
 	// Start the mail bus processor with a single registered default handler
-	mailBus := mail.NewBus(work.NewBus())
+	mailBus := mail.NewBus(work.NewConcurrentBus())
 	err = mailBus.RegisterDefaultHandler()
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Cannot register default message handler: %v", err))
