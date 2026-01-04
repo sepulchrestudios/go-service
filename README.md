@@ -1,14 +1,14 @@
-# Sepulchre Studios - Go Service
+# Sepulchre Studios - Psychokinesis (PK)
 
 ## About
 
 Developed by [@matthewfritz](https://github.com/matthewfritz).
 
-This is the core layer that is intended to serve as a module dependency for our dedicated services, written in Go.
+_Psychokinesis_ (PK) is the framework upon which all other Go-based services for Sepulchre Studios are intended to be built.
 
 An example `main.go` file is provided to show a "liveness" server running and give you an idea of how to implement your own service startup sequence.
 
-This example service runs within the provided development containers, configured within the `docker-compose.yml` file.
+The example service runs within the provided development containers, configured within the `docker-compose.yml` file.
 
 ## Configuration
 
