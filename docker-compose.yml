@@ -64,9 +64,7 @@ services:
       timeout: 5s
       retries: 5
   go-server-mail:
-    # This image hasn't been updated in a while, so we use a specific SHA digest to ensure consistent builds.
-    # This SHA digest was what "latest" pointed to as of January 4, 2026.
-    image: schickling/mailcatcher@sha256:55ed289525a565f7587b138a423705267eb34eda1ec8d35acd6dc7966a933e84
+    image: maildev/maildev:2.2.1
     restart: unless-stopped
     ports:
       - "1025:1025" # SMTP
