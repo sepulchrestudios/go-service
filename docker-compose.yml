@@ -21,10 +21,13 @@ services:
       LOAD_ENV_FROM_FILE: false
       # Use go-db-server-secret defined in the "secrets" section below
       DATABASE_PASSWORD_FILE: /run/secrets/go-db-server-secret
+      # Use go-mail-server-secret defined in the "secrets" section below
+      MAIL_PASSWORD_FILE: /run/secrets/go-mail-server-secret
     env_file:
       - .env
     secrets:
       - go-db-server-secret
+      - go-mail-server-secret
   go-server-cache:
     image: redis:8.4-alpine
     restart: unless-stopped
@@ -71,6 +74,10 @@ services:
       - "1080:1080" # Web UI
     networks:
       - go-server-network
+    environment:
+      # Set up the default maildev SMTP user credentials so we can develop with authenticated sends
+      MAILDEV_INCOMING_USER: "maildev"
+      MAILDEV_INCOMING_PASS: "maildev"
     healthcheck:
       test: [
         # Use a simple SMTP command to check if the mail server is responding
@@ -83,8 +90,11 @@ services:
       timeout: 5s
       retries: 5
 secrets:
+  # MAKE SURE THESE FILES EXIST BEFORE STARTING THE CONTAINERS!
   go-db-server-secret:
-    file: .env.db-password # MAKE SURE THIS FILE EXISTS BEFORE STARTING THE CONTAINERS!
+    file: .env.db-password
+  go-mail-server-secret:
+    file: .env.mail-password
 networks:
   go-server-network:
     driver: bridge

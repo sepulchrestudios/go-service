@@ -27,6 +27,7 @@ go.work.sum
 # env file
 .env
 .env.db-password
+.env.mail-password
 
 # Editor/IDE
 .idea/

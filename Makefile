@@ -2,6 +2,7 @@
 copy-env:
 	cp -n .env.example .env
 	cp -n .env.db-password.example .env.db-password
+	cp -n .env.mail-password.example .env.mail-password
 
 # Builds the protobuf files based on their specs
 # https://grpc-ecosystem.github.io/grpc-gateway/docs/tutorials/adding_annotations/#using-protoc
