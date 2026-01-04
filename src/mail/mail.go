@@ -2,38 +2,73 @@ package mail
 
 import "github.com/sepulchrestudios/go-service/src/work"
 
-// MessageContentContract defines the contract for representing mail message content.
-type MessageContentContract interface {
-	// Body returns the body of the mail message.
+// MessageContentBodyContract defines the contract for representing message body content.
+type MessageContentBodyContract interface {
+	// Body returns the body of the message.
 	Body() []byte
+}
 
-	// Subject returns the subject of the mail message.
+// MessageContentSubjectContract defines the contract for representing message subject content.
+type MessageContentSubjectContract interface {
+	// Subject returns the subject of the message.
 	Subject() string
 }
 
-// MessageMetadataContract defines the contract for representing mail message metadata.
-type MessageMetadataContract interface {
-	// AdditionalHeaders returns any additional headers for the mail message.
-	AdditionalHeaders() MessageHeaders
+// MessageContentContract defines the contract for representing message content.
+type MessageContentContract interface {
+	MessageContentBodyContract
+	MessageContentSubjectContract
+}
 
-	// From returns the sender's mail address.
-	From() string
+// MessageMetadataHeadersContract defines the contract for representing message headers.
+type MessageMetadataHeadersContract interface {
+	// Headers returns the headers as a map of string key-value pairs.
+	Headers() MessageHeaders
+}
 
-	// To returns the recipient's mail address.
+// MessageMetadataRecipientContract defines the contract for representing message recipient information.
+type MessageMetadataRecipientContract interface {
+	// To returns the recipient's address.
 	To() string
 }
 
-// MessageContract defines the contract for representing a mail message.
-type MessageContract interface {
+type MessageMetadataSenderContract interface {
+	// From returns the sender's address.
+	From() string
+}
+
+// MessageMetadataContract defines the contract for representing message metadata.
+type MessageMetadataContract interface {
+	MessageMetadataRecipientContract
+	MessageMetadataSenderContract
+}
+
+// MessageMetadataWithHeadersContract defines the contract for representing message metadata with headers.
+type MessageMetadataWithHeadersContract interface {
+	MessageMetadataContract
+	MessageMetadataHeadersContract
+}
+
+// MailMessageContentContract defines the contract for representing mail message content.
+type MailMessageContentContract interface {
 	// Content returns the content of the mail message.
 	Content() MessageContentContract
+}
 
+// MailMessageMetadataContract defines the contract for representing mail message metadata.
+type MailMessageMetadataContract interface {
 	// Metadata returns the metadata of the mail message.
-	Metadata() MessageMetadataContract
+	Metadata() MessageMetadataWithHeadersContract
+}
+
+// MailMessageContract defines the contract for representing a mail message.
+type MailMessageContract interface {
+	MailMessageContentContract
+	MailMessageMetadataContract
 }
 
 // MailerContract defines the contract for sending mail messages.
 type MailerContract interface {
 	// Send sends the given mail message(s) and returns the matching result(s) from the operation.
-	Send(messages []MessageContract) ([]work.WorkResultContract, error)
+	Send(messages []MailMessageContract) ([]work.WorkResultContract, error)
 }

@@ -1,4 +1,4 @@
 package mail
 
-// MessageHeaders represents any additional headers for a mail message.
+// MessageHeaders represents headers for a mail message.
 type MessageHeaders map[string]string

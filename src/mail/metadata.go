@@ -2,9 +2,9 @@ package mail
 
 // MessageMetadata holds metadata about a mail message.
 type MessageMetadata struct {
-	additionalHeaders MessageHeaders
-	from              string
-	to                string
+	headers MessageHeaders
+	from    string
+	to      string
 }
 
 // From returns the sender's mail address.
@@ -23,22 +23,22 @@ func (m *MessageMetadata) To() string {
 	return m.to
 }
 
-// AdditionalHeaders returns any additional headers for the mail message.
-func (m *MessageMetadata) AdditionalHeaders() MessageHeaders {
-	if m == nil || m.additionalHeaders == nil {
+// Headers returns any headers for the mail message.
+func (m *MessageMetadata) Headers() MessageHeaders {
+	if m == nil || m.headers == nil {
 		return MessageHeaders{}
 	}
-	return m.additionalHeaders
+	return m.headers
 }
 
 // NewMessageMetadata creates a new MessageMetadata instance.
-func NewMessageMetadata(from string, to string, additionalHeaders MessageHeaders) *MessageMetadata {
-	if additionalHeaders == nil {
-		additionalHeaders = MessageHeaders{}
+func NewMessageMetadata(from string, to string, headers MessageHeaders) *MessageMetadata {
+	if headers == nil {
+		headers = MessageHeaders{}
 	}
 	return &MessageMetadata{
-		from:              from,
-		to:                to,
-		additionalHeaders: additionalHeaders,
+		from:    from,
+		to:      to,
+		headers: headers,
 	}
 }
