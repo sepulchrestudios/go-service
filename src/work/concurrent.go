@@ -73,12 +73,15 @@ func (b *ConcurrentBus) Subscribe(workItem WorkContract) []WorkResultContract {
 	defer b.handlersMu.Unlock()
 
 	// Set up a consistent way to process our work handlers.
+	var wg sync.WaitGroup
 	processingResultChan := make(chan WorkResultContract)
 	processHandlersFunc := func(handlers []HandlerFunc) {
 		for _, handler := range handlers {
 			if handler != nil {
 				// Process each work handler in its own goroutine to avoid creating a blocking queue.
+				wg.Add(1)
 				go func(handlerFunc HandlerFunc) {
+					defer wg.Done()
 					result := handlerFunc(workItem)
 					if result != nil {
 						processingResultChan <- result
@@ -96,6 +99,9 @@ func (b *ConcurrentBus) Subscribe(workItem WorkContract) []WorkResultContract {
 	if handlers, exists := b.handlers[WorkTypeAll]; exists {
 		processHandlersFunc(handlers)
 	}
+
+	// Wait for the handlers to finish processing
+	wg.Wait()
 
 	// Return all errors (if any) encountered during work processing.
 	close(processingResultChan)
