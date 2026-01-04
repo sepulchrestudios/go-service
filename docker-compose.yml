@@ -13,6 +13,8 @@ services:
         condition: service_healthy
       go-server-db:
         condition: service_healthy
+      go-server-mail:
+        condition: service_healthy
     environment:
       # Set to false since we are going to be using the "env_file" option to load environment variables from a file
       # and export them to the container, not load them directly into the file-based configuration map in the service
@@ -57,6 +59,27 @@ services:
         "-U", "${POSTGRES_USER:-postgres}",
         "-d", "${POSTGRES_DB:-postgres}",
         "-h", "go-server-db", # Use the service name as the host, not "localhost": https://stackoverflow.com/a/78477653
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  go-server-mail:
+    # This image hasn't been updated in a while, so we use a specific SHA digest to ensure consistent builds.
+    # This SHA digest was what "latest" pointed to as of January 4, 2026.
+    image: schickling/mailcatcher@sha256:55ed289525a565f7587b138a423705267eb34eda1ec8d35acd6dc7966a933e84
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "1080:1080" # Web UI
+    networks:
+      - go-server-network
+    healthcheck:
+      test: [
+        # Use a simple SMTP command to check if the mail server is responding
+        "CMD",
+        "echo", "EHLO", "0.0.0.0",
+        "|",
+        "nc", "0.0.0.0", "1025",
       ]
       interval: 10s
       timeout: 5s
