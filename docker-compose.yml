@@ -92,9 +92,9 @@ services:
 secrets:
   # MAKE SURE THESE FILES EXIST BEFORE STARTING THE CONTAINERS!
   go-db-server-secret:
-    file: .env.db-password
+    file: build/secrets/.env.db-password
   go-mail-server-secret:
-    file: .env.mail-password
+    file: build/secrets/.env.mail-password
 networks:
   go-server-network:
     driver: bridge
