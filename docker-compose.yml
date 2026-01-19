@@ -21,12 +21,15 @@ services:
       LOAD_ENV_FROM_FILE: false
       # Use go-db-server-secret defined in the "secrets" section below
       DATABASE_PASSWORD_FILE: /run/secrets/go-db-server-secret
+      # Use go-feature-flag-server-secret defined in the "secrets" section below
+      FEATURE_FLAG_SDK_KEY_FILE: /run/secrets/go-feature-flag-server-secret
       # Use go-mail-server-secret defined in the "secrets" section below
       MAIL_PASSWORD_FILE: /run/secrets/go-mail-server-secret
     env_file:
       - .env
     secrets:
       - go-db-server-secret
+      - go-feature-flag-server-secret
       - go-mail-server-secret
   go-server-cache:
     image: redis:8.4-alpine
@@ -93,6 +96,8 @@ secrets:
   # MAKE SURE THESE FILES EXIST BEFORE STARTING THE CONTAINERS!
   go-db-server-secret:
     file: build/secrets/.env.db-password
+  go-feature-flag-server-secret:
+    file: build/secrets/.env.feature-flag-sdk-key
   go-mail-server-secret:
     file: build/secrets/.env.mail-password
 networks:

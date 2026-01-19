@@ -52,6 +52,12 @@ const (
 	// PropertyNameEnvironment represents the environment on which the service is running.
 	PropertyNameEnvironment PropertyName = "ENVIRONMENT"
 
+	// PropertyNameFeatureFlagSDKKey represents the SDK key for the feature flag service.
+	PropertyNameFeatureFlagSDKKey PropertyName = "FEATURE_FLAG_SDK_KEY"
+
+	// PropertyNameFeatureFlagSDKKeyFile represents the file path from which to read the feature flag SDK key.
+	PropertyNameFeatureFlagSDKKeyFile PropertyName = "FEATURE_FLAG_SDK_KEY_FILE"
+
 	// PropertyNameGRPCPort represents the port on which the gRPC server will be listening.
 	PropertyNameGRPCPort PropertyName = "GRPC_PORT"
 
@@ -105,6 +111,8 @@ func GetAvailableConfigurationKeys() []PropertyName {
 		PropertyNameDatabaseTimezone,
 		PropertyNameDebugMode,
 		PropertyNameEnvironment,
+		PropertyNameFeatureFlagSDKKey,
+		PropertyNameFeatureFlagSDKKeyFile,
 		PropertyNameGRPCPort,
 		PropertyNameHTTPPort,
 		PropertyNameLoadEnvFromFile,

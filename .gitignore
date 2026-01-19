@@ -27,9 +27,9 @@ go.work.sum
 # env file
 .env
 
-# Docker secrets
-build/secrets/.env.db-password
-build/secrets/.env.mail-password
+# Docker secrets (but keep example files)
+build/secrets/*
+!build/secrets/*.example
 
 # Editor/IDE
 .idea/

@@ -2,6 +2,7 @@
 copy-env:
 	cp -n .env.example .env
 	cp -n ./build/secrets/.env.db-password.example ./build/secrets/.env.db-password
+	cp -n ./build/secrets/.env.feature-flag-sdk-key.example ./build/secrets/.env.feature-flag-sdk-key
 	cp -n ./build/secrets/.env.mail-password.example ./build/secrets/.env.mail-password
 
 # Builds the protobuf files based on their specs
