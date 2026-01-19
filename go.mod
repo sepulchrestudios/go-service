@@ -3,49 +3,49 @@ module github.com/sepulchrestudios/go-service
 go 1.24.4
 
 require (
-	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
+	github.com/joho/godotenv v1.5.1
+	github.com/open-feature/go-sdk v1.17.1
+	github.com/redis/go-redis/v9 v9.17.2
+	go.uber.org/zap v1.27.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
+	google.golang.org/grpc v1.71.0
+	google.golang.org/protobuf v1.36.6
+	gorm.io/driver/postgres v1.6.0
+	gorm.io/gorm v1.30.0
+)
+
+require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/devcyclehq/go-server-sdk/v2 v2.24.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.25.0 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.6.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/launchdarkly/eventsource v1.8.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/matryer/try v0.0.0-20161228173917-9ac251b645a2 // indirect
-	github.com/open-feature/go-sdk v1.14.1 // indirect
-	github.com/redis/go-redis/v9 v9.17.2 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/twmb/murmur3 v1.1.8 // indirect
+	go.uber.org/mock v0.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
-	google.golang.org/grpc v1.71.0 // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/datatypes v1.2.5 // indirect
-	gorm.io/driver/mysql v1.5.6 // indirect
-	gorm.io/driver/postgres v1.6.0 // indirect
-	gorm.io/gorm v1.30.0 // indirect
 )
 
 tool (
