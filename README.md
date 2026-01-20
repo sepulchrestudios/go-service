@@ -62,6 +62,8 @@ Copy the relevant CA certificate into the `build/certs` directory and make sure 
 
 The `Dockerfile` steps are configured to auto-copy certs in that location and update the CA bundle in the image when building.
 
+After adding the certificate, rebuild and restart the Docker container and you should be all set!
+
 ### Unsure how to retrieve a CA certificate?
 
 You can use the `openssl` binary from the command line to get its X.509-formatted data.
@@ -76,5 +78,3 @@ The steps are fundamentally as follows (massaged from that link):
 Replace `<hostname>` with the relevant hostname from which you wish to retrieve the certificate.
 
 Replace `<filename>` with the relevant filename you wish to generate.
-
-Rebuild and restart the Docker container and you should be all set!
