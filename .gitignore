@@ -31,6 +31,10 @@ go.work.sum
 build/secrets/*
 !build/secrets/*.example
 
+# Custom certs (like CA certs) needed for the building and running
+build/certs/*
+!build/certs/.gitkeep
+
 # Editor/IDE
 .idea/
 .vscode/
