@@ -23,16 +23,15 @@ func RegisterOpenFeatureProvider(
 	// Set up a channel to signal when the provider is ready since we will be doing asynchronous registration.
 	readyChan := make(chan struct{})
 	readyCallbackFunc := func(details openfeature.EventDetails) {
-		if details.ProviderName == domainAsString {
-			close(readyChan)
-		}
+		close(readyChan)
 	}
-	openfeature.AddHandler(openfeature.ProviderReady, &readyCallbackFunc)
 
-	// Register the provider via OpenFeature.
+	// Register the provider via OpenFeature and add the ready callback handler to it.
 	err := openfeature.SetNamedProviderWithContext(ctx, domainAsString, provider)
 	if err != nil {
 		return nil, nil, fmt.Errorf("%w: %w", ErrFailedToRegisterFeatureFlagProvider, err)
 	}
-	return openfeature.NewClient(domainAsString), readyChan, nil
+	client := openfeature.NewClient(domainAsString)
+	client.AddHandler(openfeature.ProviderReady, &readyCallbackFunc)
+	return client, readyChan, nil
 }

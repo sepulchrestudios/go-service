@@ -8,12 +8,17 @@ import (
 	gohttp "net/http"
 	"os"
 	"strconv"
+	"time"
 
+	devcycle "github.com/devcyclehq/go-server-sdk/v2"
+	devcycleapi "github.com/devcyclehq/go-server-sdk/v2/api"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/open-feature/go-sdk/openfeature"
 	"github.com/sepulchrestudios/go-service/src/cache"
 	"github.com/sepulchrestudios/go-service/src/config"
 	"github.com/sepulchrestudios/go-service/src/database"
 	"github.com/sepulchrestudios/go-service/src/event"
+	"github.com/sepulchrestudios/go-service/src/feature"
 	servicelogger "github.com/sepulchrestudios/go-service/src/log"
 	"github.com/sepulchrestudios/go-service/src/mail"
 	"github.com/sepulchrestudios/go-service/src/server"
@@ -30,17 +35,13 @@ func connectToCacheFromConfig(
 	ctx context.Context, envConfig config.Contract, isDebugModeActive bool, debugLogger servicelogger.DebugContract,
 ) (cache.Contract, error) {
 	// Resolve the cache password from either a file path or the direct property
-	var cachePassword string
-	cachePasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameCachePasswordFile)
-	if exists && cachePasswordFilePath != "" {
-		passwordBytes, err := os.ReadFile(cachePasswordFilePath)
-		if err != nil {
-			return nil, fmt.Errorf("Cannot read cache password from file path '%s': %v", cachePasswordFilePath, err)
-		}
-		cachePassword = string(passwordBytes)
-	} else {
-		// Cache password is optional so being completely blank regardless of existence is a valid scenario
-		cachePassword, _ = envConfig.GetProperty(config.PropertyNameCachePassword)
+	//
+	// Cache password is optional so being completely blank regardless of existence is a valid scenario
+	cachePassword, _, err := readSecretFromFileOrEnvFallback(
+		config.PropertyNameCachePasswordFile, config.PropertyNameCachePassword, envConfig,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Create the cache connection from the environment configuration
@@ -84,20 +85,15 @@ func connectToDatabaseFromConfig(
 	envConfig config.Contract, isDebugModeActive bool,
 ) (database.Contract, error) {
 	// Resolve the DB password from either a file path or the direct property
-	var dbPassword string
-	dbPasswordFilePath, exists := envConfig.GetProperty(config.PropertyNameDatabasePasswordFile)
-	if exists && dbPasswordFilePath != "" {
-		passwordBytes, err := os.ReadFile(dbPasswordFilePath)
-		if err != nil {
-			return nil, fmt.Errorf("Cannot read database password from file path '%s': %v", dbPasswordFilePath, err)
-		}
-		dbPassword = string(passwordBytes)
-	} else {
-		dbPassword, exists = envConfig.GetProperty(config.PropertyNameDatabasePassword)
-		if !exists {
-			return nil, fmt.Errorf("Cannot read property from configuration (make sure it exists): %s",
-				config.PropertyNameDatabasePassword)
-		}
+	dbPassword, exists, err := readSecretFromFileOrEnvFallback(
+		config.PropertyNameDatabasePasswordFile, config.PropertyNameDatabasePassword, envConfig,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, fmt.Errorf("Cannot read property from configuration (make sure it exists): %s",
+			config.PropertyNameDatabasePassword)
 	}
 
 	// Create the Postgres connection from the environment configuration
@@ -130,6 +126,41 @@ func connectToDatabaseFromConfig(
 	return database.NewPostgresDatabaseConnection(connectionArguments, isDebugModeActive)
 }
 
+// Connect to the intended feature flag service using the provided environment configuration. Returns the OpenFeature
+// provider, a channel that will be unblocked upon readiness, plus any error that may have occurred.
+func connectToFeatureFlagServiceFromConfig(
+	envConfig config.Contract,
+) (openfeature.FeatureProvider, chan devcycleapi.ClientEvent, error) {
+	// Resolve the SDK key from either a file path or the direct property
+	sdkKey, exists, err := readSecretFromFileOrEnvFallback(
+		config.PropertyNameFeatureFlagSDKKeyFile, config.PropertyNameFeatureFlagSDKKey, envConfig,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !exists {
+		return nil, nil, fmt.Errorf("Cannot read property from configuration (make sure it exists): %s",
+			config.PropertyNameFeatureFlagSDKKey)
+	}
+	// Create the DevCycle client and OpenFeature provider with basic options
+	onInitializedChannel := make(chan devcycleapi.ClientEvent)
+	options := devcycle.Options{
+		ClientEventHandler:           onInitializedChannel,
+		EnableEdgeDB:                 false,
+		EnableCloudBucketing:         false,
+		EventFlushIntervalMS:         30 * time.Second,
+		ConfigPollingIntervalMS:      1 * time.Minute,
+		RequestTimeout:               30 * time.Second,
+		DisableAutomaticEventLogging: false,
+		DisableCustomEventLogging:    false,
+	}
+	_, provider, err := feature.NewDevCycleClient(sdkKey, &options)
+	if err != nil {
+		return nil, nil, err
+	}
+	return provider, onInitializedChannel, nil
+}
+
 // pumpEventBus pumps events from the provided event bus in its own goroutine.
 func pumpEventBus(ctx context.Context, eventBus work.BusPumperContract, debugLogger servicelogger.DebugContract) {
 	go func(ctx context.Context, bus work.BusPumperContract, logger servicelogger.DebugContract) {
@@ -154,6 +185,29 @@ func pumpMailBus(ctx context.Context, mailBus work.BusPumperContract, debugLogge
 		err := bus.Pump(ctx)
 		logger.Debug("Finished pumping mail messages.", zap.Error(err))
 	}(ctx, mailBus, debugLogger)
+}
+
+// readSecretFromFileOrEnvFallback attempts to read a secret from a file path specified in the configuration. If the
+// file path property does not exist or is otherwise empty, it falls back to reading the secret directly from the
+// environment configuration. It returns the resolved secret, a boolean indicating whether the secret was found, and
+// any error encountered during the process.
+func readSecretFromFileOrEnvFallback(
+	filePathPropertyName config.PropertyName, envPropertyName config.PropertyName, envConfig config.Contract,
+) (string, bool, error) {
+	// Resolve the secret from either a file path or the direct property
+	var secret string
+	secretFilePath, exists := envConfig.GetProperty(filePathPropertyName)
+	if exists && secretFilePath != "" {
+		secretBytes, err := os.ReadFile(secretFilePath)
+		if err != nil {
+			return "", exists, fmt.Errorf("Cannot read secret from file path '%s': %v", secretFilePath, err)
+		}
+		secret = string(secretBytes)
+	} else {
+		// Secret being completely blank regardless of existence is also a valid scenario
+		secret, exists = envConfig.GetProperty(envPropertyName)
+	}
+	return secret, exists, nil
 }
 
 func main() {
@@ -223,6 +277,20 @@ func main() {
 	}
 	pumpMailBus(cancelCtx, mailBus, logger)
 
+	// Set up the feature flag provider to work with OpenFeature; in our case, we're using DevCycle
+	logger.Info("Setting up feature flag provider...")
+	featureFlagProvider, devCycleReadyChan, err := connectToFeatureFlagServiceFromConfig(envConfig)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot set up feature flag provider from DevCycle client: %v", err))
+	}
+	_, openFeatureReadyChan, err := feature.RegisterOpenFeatureProvider(
+		ctx, feature.DomainNameFeatureFlags, featureFlagProvider,
+	)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot register feature flag provider with OpenFeature: %v", err))
+	}
+	logger.Info("Feature flag provider set up successfully")
+
 	// Resolve the necessary ports
 	grpcPort, exists := envConfig.GetProperty(config.PropertyNameGRPCPort)
 	if !exists {
@@ -277,11 +345,17 @@ func main() {
 
 	logger.Info(fmt.Sprintf("Serving gRPC-Gateway on http://0.0.0.0:%s", httpPort))
 	logger.Fatal(func() string {
+		// Wait for the feature flag provider to be initialized before serving traffic
+		<-devCycleReadyChan
+		logger.Info("DevCycle client initialized")
+		<-openFeatureReadyChan
+		logger.Info("OpenFeature provider initialized")
 		// Signal that we are ready to receive traffic and then serve the endpoints
 		err := livenessServer.MarkReady()
 		if err != nil {
 			return err.Error()
 		}
+		logger.Info("Service is now marked as ready to receive traffic")
 		err = gwServer.ListenAndServe()
 		if err != nil {
 			return err.Error()
